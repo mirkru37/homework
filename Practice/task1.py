@@ -1,4 +1,4 @@
-def input_int(message):
+﻿def input_int(message):
     try:
         val = int(input(message))
     except ValueError:
