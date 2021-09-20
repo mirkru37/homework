@@ -68,7 +68,7 @@ def auto_matrix(n, m, range_):
 def fill_matrix_by_rows(n, m):
     matrix = []
     print("Please enter numbers separating by ' '.\n "
-          "If your row will be shorter than N or empty,"
+          f"If your row will be shorter than {m} or empty,"
           " it will be automatically filled with duplicate of first element")
     for i in range(n):
         row = [num for num in input(f"Enter row {i + 1}: ").split()]
@@ -126,17 +126,18 @@ def top_down(matrix):
     global sort_iterations
     is_sorted = True
     n = len(matrix)
+    m = len(matrix[0])
     for i in range(1, n):
-        for j in range(n // 2):
-            if matrix[i][j] < matrix[i - 1][n - j - 1]:
+        for j in range(m // 2):
+            if matrix[i][j] < matrix[i - 1][m - j - 1]:
                 sort_iterations += 1
-                matrix[i][j], matrix[i - 1][n - j - 1] = matrix[i - 1][n - j - 1], matrix[i][j]
+                matrix[i][j], matrix[i - 1][m - j - 1] = matrix[i - 1][m - j - 1], matrix[i][j]
                 is_sorted = False
     return is_sorted
 
 
 def top_down_sort(matrix):
-    for i in matrix:
+    for _ in matrix:
         is_sorted = top_down(matrix)
         if is_sorted:
             break
@@ -181,7 +182,7 @@ def search_in_matrix(matrix, element, end=None, start=None):
     if start is None:
         start = [0, 0]
     if end is None:
-        end = [len(matrix)-1, len(matrix)-1]
+        end = [len(matrix)-1, len(matrix[0])-1]
     # find row
     i = start[0]
     while i <= end[0] and i < len(matrix):
@@ -251,12 +252,5 @@ def menu_fill(n, m):
 
 
 n = input_upper_zero_int("Please input N: ")
-# m = input_upper_zero_int("Please input M: ")
-menu_fill(n, n)
-
-# def a(a, b, lamb):
-#     return lamb(a, b)
-#
-#
-# f, f1 = 3, 2
-# print(a(f, f1,lambda b, c: b > c))
+m = input_upper_zero_int("Please input M: ")
+menu_fill(n, m)
