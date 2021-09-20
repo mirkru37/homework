@@ -1,5 +1,3 @@
-import math
-
 import numpy as np
 import random
 
@@ -11,15 +9,11 @@ def partition(start, end, array):
     pivot_index = start
     pivot = array[pivot_index]
     while start < end:
-        sort_iterations += 1
-        while start < len(array) and array[start] <= pivot:
-            sort_iterations += 1
+        while start < len(array) and compare_num_with_string(array[start], pivot, lambda a, b: a <= b):
             start += 1
-        sort_iterations += 1
-        while array[end] > pivot:
+        while compare_num_with_string(array[end], pivot, lambda a, b: a > b):
             sort_iterations += 1
             end -= 1
-        sort_iterations += 1
         if start < end:
             sort_iterations += 1
             array[start], array[end] = array[end], array[start]
@@ -40,7 +34,6 @@ def generate_random_arr(size, range_):
     for i in range(size):
         arr.append(random.choice(range_))
     return arr
-    # return random.sample(range_, size)
 
 
 def input_int(message):
@@ -55,7 +48,6 @@ def input_int(message):
 def input_upper_zero_int(message):
     res = input_int(message)
     if res <= 0:
-        # raise ValueError("Invalid array size")
         print("You've entered wrong value. Try again!!")
         return input_upper_zero_int(message)
     return res
@@ -136,7 +128,6 @@ def top_down(matrix):
     n = len(matrix)
     for i in range(1, n):
         for j in range(n // 2):
-            sort_iterations += 1
             if matrix[i][j] < matrix[i - 1][n - j - 1]:
                 sort_iterations += 1
                 matrix[i][j], matrix[i - 1][n - j - 1] = matrix[i - 1][n - j - 1], matrix[i][j]
@@ -169,7 +160,21 @@ def get_menu_option(message):
 
 
 def get_middle(start, end):
-    return (end - start) // 2
+    return start + (end - start) // 2
+
+
+def is_num(x):
+    try:
+        float(x)
+        return True
+    except ValueError:
+        return False
+
+
+def compare_num_with_string(a, b, compare):
+    if not is_num(a) or not is_num(b):
+        return compare(str(a), str(b))
+    return compare(float(a), float(b))
 
 
 def search_in_matrix(matrix, element, end=None, start=None):
@@ -180,17 +185,17 @@ def search_in_matrix(matrix, element, end=None, start=None):
     # find row
     i = start[0]
     while i <= end[0] and i < len(matrix):
-        if str(matrix[i][end[1]]) >= element:
+        if compare_num_with_string(matrix[i][end[1]], element, lambda a, b: a >= b):
             break
         i += 1
-    if i >= end[0] or i >= len(matrix):
+    if i > end[0] or i >= len(matrix):
         return -1, -1
     # find column
     while start[1] <= end[1]:
         j = get_middle(start[1], end[1])
-        if str(matrix[i][j]) == element:
+        if compare_num_with_string(matrix[i][j], element, lambda a, b: a == b):
             return i, j
-        elif str(matrix[i][j]) > element:
+        elif compare_num_with_string(matrix[i][j], element, lambda a, b: a > b):
             end[1] = j-1
         else:
             start[1] = j+1
@@ -202,7 +207,10 @@ def menu_binary_search(matrix):
     if option == '1':
         element = input("Enter the element: ")
         i, j = search_in_matrix(matrix, element)
-        print(f"Element in [{i}][{j}]")
+        if i == -1 or j == -1:
+            print("There is no such element!")
+        else:
+            print(f"Element in [{i}][{j}]")
         menu_binary_search(matrix)
     elif option == '2':
         exit()
@@ -219,7 +227,7 @@ def menu_fill(n, m):
     if option == '1':
         range_, back = input_range()
         if back or not range_:
-            if not range_:
+            if not back:
                 print("Empty range. Try again!")
             menu_fill(n, m)
             return
@@ -241,8 +249,14 @@ def menu_fill(n, m):
     print_matrix(matrix)
     menu_binary_search(matrix)
 
-print('a' > 'b')
-print("7" >= '17')
+
 n = input_upper_zero_int("Please input N: ")
 # m = input_upper_zero_int("Please input M: ")
 menu_fill(n, n)
+
+# def a(a, b, lamb):
+#     return lamb(a, b)
+#
+#
+# f, f1 = 3, 2
+# print(a(f, f1,lambda b, c: b > c))
