@@ -4,6 +4,44 @@ import random
 sort_iterations = 0
 
 
+def print_matrix(matrix, message=''):
+    print(message)
+    for row in matrix:
+        print(row)
+
+
+def get_menu_option(message=""):
+    print(message)
+    return input("-->").strip()
+
+
+def get_middle(start, end):
+    return start + (end - start) // 2
+
+
+def is_num(x):
+    try:
+        float(x)
+        return True
+    except ValueError:
+        return False
+
+
+def close(*_):
+    exit()
+
+
+def invalid_option(*_):
+    print("Invalid choice!!")
+    raise ValueError("Invalid menu option")
+
+
+def compare_num_with_string(a, b, compare):
+    if not is_num(a) or not is_num(b):
+        return compare(str(a), str(b))
+    return compare(float(a), float(b))
+
+
 def partition(start, end, array):
     global sort_iterations
     pivot_index = start
@@ -12,7 +50,6 @@ def partition(start, end, array):
         while start < len(array) and compare_num_with_string(array[start], pivot, lambda a, b: a <= b):
             start += 1
         while compare_num_with_string(array[end], pivot, lambda a, b: a > b):
-            sort_iterations += 1
             end -= 1
         if start < end:
             sort_iterations += 1
@@ -27,85 +64,6 @@ def quick_sort(start, end, array):
         p = partition(start, end, array)
         quick_sort(start, p - 1, array)
         quick_sort(p + 1, end, array)
-
-
-def generate_random_arr(size, range_):
-    arr = []
-    for i in range(size):
-        arr.append(random.choice(range_))
-    return arr
-
-
-def input_int(message):
-    try:
-        val = int(input(message))
-    except ValueError:
-        print("Invalid value. Try again!!")
-        return input_int(message)
-    return val
-
-
-def input_upper_zero_int(message):
-    res = input_int(message)
-    if res <= 0:
-        print("You've entered wrong value. Try again!!")
-        return input_upper_zero_int(message)
-    return res
-
-
-def print_matrix(matrix):
-    for row in matrix:
-        print(row)
-
-
-def auto_matrix(n, m, range_):
-    matrix = []
-    for i in range(n):
-        matrix.append(generate_random_arr(m, range_))
-    return matrix
-
-
-def fill_matrix_by_rows(n, m):
-    matrix = []
-    print("Please enter numbers separating by ' '.\n "
-          f"If your row will be shorter than {m} or empty,"
-          " it will be automatically filled with duplicate of first element")
-    for i in range(n):
-        row = [num for num in input(f"Enter row {i + 1}: ").split()]
-        row = np.resize(row, m)
-        matrix.append(row)
-    return matrix
-
-
-def fill_matrix_manual(n, m):
-    matrix = []
-    for i in range(n):
-        row = []
-        for j in range(m):
-            row.append(input(f"Enter [{i + 1}][{j + 1}] element: "))
-        matrix.append(row)
-    return matrix
-
-
-def input_range():
-    option = get_menu_option("1-enter array of available values"
-                             "\n2-enter borders"
-                             "\n3-return")
-    if option == '1':
-        print("Enter values:")
-        range_ = input().split()
-    elif option == '2':
-        a = input_int("Enter A: ")
-        b = input_int("Enter B: ")
-        if a > b:
-            a, b = b, a
-        range_ = range(a, b)
-    elif option == '3':
-        return [], True
-    else:
-        print("Wrong option!")
-        return input_range()
-    return range_, False
 
 
 def row_sort(matrix):
@@ -155,34 +113,87 @@ def sort_matrix(matrix):
     return matrix.tolist()
 
 
-def get_menu_option(message):
-    print(message)
-    return input("-->").strip()
+def generate_random_arr(size, range_):
+    arr = []
+    for i in range(size):
+        arr.append(random.choice(range_))
+    return arr
 
 
-def get_middle(start, end):
-    return start + (end - start) // 2
-
-
-def is_num(x):
+def input_int(message):
     try:
-        float(x)
-        return True
+        val = int(input(message))
     except ValueError:
-        return False
+        print("Invalid value. Try again!!")
+        return input_int(message)
+    return val
 
 
-def compare_num_with_string(a, b, compare):
-    if not is_num(a) or not is_num(b):
-        return compare(str(a), str(b))
-    return compare(float(a), float(b))
+def input_upper_zero_int(message):
+    res = input_int(message)
+    if res <= 0:
+        print("You've entered wrong value. Try again!!")
+        return input_upper_zero_int(message)
+    return res
+
+
+def input_range():
+    option = get_menu_option("1-enter array of available values"
+                             "\n2-enter borders"
+                             "\n3-return")
+    if option == '1':
+        print("Enter values:")
+        range_ = input().split()
+    elif option == '2':
+        a = input_int("Enter A: ")
+        b = input_int("Enter B: ")
+        if a > b:
+            a, b = b, a
+        range_ = range(a, b)
+    elif option == '3':
+        return [], True
+    else:
+        print("Wrong option!")
+        return input_range()
+    return range_, False
+
+
+def auto_matrix(n, m, range_):
+    matrix = []
+    for i in range(n):
+        matrix.append(generate_random_arr(m, range_))
+    return matrix
+
+
+def fill_matrix_by_rows(data):
+    n, m = data[0], data[1]
+    matrix = []
+    print("Please enter numbers separating by ' '.\n "
+          f"If your row will be shorter than {m} or empty,"
+          " it will be automatically filled with duplicate of first element")
+    for i in range(n):
+        row = [num for num in input(f"Enter row {i + 1}: ").split()]
+        row = np.resize(row, m)
+        matrix.append(row)
+    return matrix
+
+
+def fill_matrix_manual(data):
+    n, m = data[0], data[1]
+    matrix = []
+    for i in range(n):
+        row = []
+        for j in range(m):
+            row.append(input(f"Enter [{i + 1}][{j + 1}] element: "))
+        matrix.append(row)
+    return matrix
 
 
 def search_in_matrix(matrix, element, end=None, start=None):
     if start is None:
         start = [0, 0]
     if end is None:
-        end = [len(matrix)-1, len(matrix[0])-1]
+        end = [len(matrix) - 1, len(matrix[0]) - 1]
     # find row
     i = start[0]
     while i <= end[0] and i < len(matrix):
@@ -197,60 +208,60 @@ def search_in_matrix(matrix, element, end=None, start=None):
         if compare_num_with_string(matrix[i][j], element, lambda a, b: a == b):
             return i, j
         elif compare_num_with_string(matrix[i][j], element, lambda a, b: a > b):
-            end[1] = j-1
+            end[1] = j - 1
         else:
-            start[1] = j+1
+            start[1] = j + 1
     return -1, -1
 
 
-def menu_binary_search(matrix):
-    option = get_menu_option("Please choose what to do\n1-search\n2-exit")
-    if option == '1':
-        element = input("Enter the element: ")
-        i, j = search_in_matrix(matrix, element)
-        if i == -1 or j == -1:
-            print("There is no such element!")
-        else:
-            print(f"Element in [{i}][{j}]")
-        menu_binary_search(matrix)
-    elif option == '2':
-        exit()
+def binary_search(matrix):
+    element = input("Enter the element: ")
+    i, j = search_in_matrix(matrix, element)
+    if i == -1 or j == -1:
+        print("There is no such element!")
     else:
-        print("Wrong option!")
-        menu_binary_search(matrix)
-        return
+        print(f"Element in [{i}][{j}]")
+    menu(menu_search, matrix, "Please choose what to do:")
 
 
-def menu_fill(n, m):
-    option = get_menu_option("Please choose how to fill matrix: \n1-auto fill\n2-fill by rows\n3-fill by "
-                             "elements\n4-exit")
-    matrix = []
-    if option == '1':
-        range_, back = input_range()
-        if back or not range_:
-            if not back:
-                print("Empty range. Try again!")
-            menu_fill(n, m)
-            return
-        matrix = auto_matrix(n, m, range_)
-    elif option == '2':
-        matrix = fill_matrix_by_rows(n, m)
-    elif option == '3':
-        matrix = fill_matrix_manual(n, m)
-    elif option == '4':
-        exit()
-    else:
-        print("Wrong option!")
-        menu_fill(n, m)
-        return
-    print_matrix(matrix)
-    matrix = sort_matrix(matrix)
-    print(f"Iterations for sorting: {sort_iterations}")
-    print("Sorted matrix: ")
-    print_matrix(matrix)
-    menu_binary_search(matrix)
+def fill_matrix_auto(data):
+    n, m = data[0], data[1]
+    range_, back = input_range()
+    if back or not range_:
+        if not back:
+            print("Empty range. Try again!")
+        return menu(menu_fill, [n, m], "Please choose how to fill matrix:")
+    return auto_matrix(n, m, range_)
 
+
+def menu(template, data, greet_message='', message_for_get=''):
+    print(greet_message)
+    for key in template:
+        print(f"{key}: {template[key][0]}")
+    option = get_menu_option(message_for_get)
+    try:
+        return template.get(option, [None, invalid_option])[1](data)
+    except ValueError:
+        return menu(template, data, greet_message, message_for_get)
+
+
+menu_fill = {
+    "1": ("Auto fill", fill_matrix_auto),
+    "2": ("Fill by rows", fill_matrix_by_rows),
+    "3": ("Fill manually", fill_matrix_manual),
+    "4": ("Exit", close)
+}
+
+menu_search = {
+    "1": ("Search", binary_search),
+    "2": ("Exit", close),
+}
 
 n = input_upper_zero_int("Please input N: ")
 m = input_upper_zero_int("Please input M: ")
-menu_fill(n, m)
+matrix = menu(menu_fill, [n, m], "Please choose how to fill matrix:")
+print_matrix(matrix, "Your matrix: ")
+matrix = sort_matrix(matrix)
+print(f"Iterations for sorting: {sort_iterations}")
+print_matrix(matrix, "Sorted matrix: ")
+menu(menu_search, matrix, "Please choose what to do:")
