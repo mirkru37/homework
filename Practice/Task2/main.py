@@ -15,8 +15,23 @@ def get_menu_option(message=""):
     return input("-->").strip()
 
 
-def get_middle(start, end):
-    return start + (end - start) // 2
+def get_middle_in_matrix(start, end, columns):
+    if start == end or \
+            (start[0] == end[0] and end[1] - start[1] == 1) or \
+            (start[1] == columns and end[1] == 0 and end[0] - start[0] == 1):
+        return end
+    add = ((end[0] * columns + end[1] + 1) - (start[0] * columns + start[1] + 1)) // 2
+    # mid = start[0] * columns + start[1] \
+    #       + (end[0] * columns + end[1] - start[0] * columns + start[1]) // 2
+    return move_matrix_index(start, add, columns)
+
+
+def move_matrix_index(ij, index, columns):
+    ij = ij.copy()
+    ij[1] += index
+    ij[0] += ij[1] // columns
+    ij[1] = ij[1] % columns
+    return ij
 
 
 def is_num(x):
@@ -36,7 +51,7 @@ def invalid_option(*_):
     raise ValueError("Invalid menu option")
 
 
-def compare_num_with_string(a, b, compare):
+def compare_num_with_string(a, b, compare=lambda a, b: a == b):
     if not is_num(a) or not is_num(b):
         return compare(str(a), str(b))
     return compare(float(a), float(b))
@@ -190,31 +205,28 @@ def fill_matrix_manual(data):
 
 
 def search_in_matrix(matrix, element, end=None, start=None):
-    if start is None:
+    rows = len(matrix)
+    columns = len(matrix[0])
+    if start is None or start < [0, 0]:
         start = [0, 0]
-    if end is None:
-        end = [len(matrix) - 1, len(matrix[0]) - 1]
-    # find row
-    i = start[0]
-    while i <= end[0] and i < len(matrix):
-        if compare_num_with_string(matrix[i][end[1]], element, lambda a, b: a >= b):
+    if end is None or end > [rows - 1, columns - 1]:
+        end = [rows - 1, columns - 1]
+
+    ij = start
+    while start <= end:
+        ij = get_middle_in_matrix(start, end, columns)
+        if compare_num_with_string(matrix[ij[0]][ij[1]], element):
             break
-        i += 1
-    if i > end[0] or i >= len(matrix):
-        return -1, -1
-    # find column
-    while start[1] <= end[1]:
-        j = get_middle(start[1], end[1])
-        if compare_num_with_string(matrix[i][j], element, lambda a, b: a == b):
-            return i, j
-        elif compare_num_with_string(matrix[i][j], element, lambda a, b: a > b):
-            end[1] = j - 1
+        elif compare_num_with_string(matrix[ij[0]][ij[1]], element, lambda a, b: a > b):
+            end = move_matrix_index(ij, -1, columns)
         else:
-            start[1] = j + 1
-    return -1, -1
+            start = move_matrix_index(ij, 1, columns)
+    if start > end:
+        ij = [-1, -1]
+    return ij[0], ij[1]
 
 
-def binary_search(matrix):
+def search(matrix):
     element = input("Enter the element: ")
     i, j = search_in_matrix(matrix, element)
     if i == -1 or j == -1:
@@ -253,7 +265,7 @@ menu_fill = {
 }
 
 menu_search = {
-    "1": ("Search", binary_search),
+    "1": ("Search", search),
     "2": ("Exit", close),
 }
 
