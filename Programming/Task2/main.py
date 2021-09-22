@@ -1,8 +1,8 @@
 import numpy as np
 
 
-def generate_random_int_arr(size):
-    return np.random.randint(0, 100, size)
+def generate_random_int_arr(a, b, size):
+    return np.random.randint(a, b, size)
 
 
 def input_int(message):
@@ -44,10 +44,10 @@ def palindrome_rows_index(rows):
     return rows_index
 
 
-def auto_matrix(n):
+def auto_matrix(a, b, n):
     matrix = []
     for i in range(n):
-        matrix.append(generate_random_int_arr(n))
+        matrix.append(generate_random_int_arr(a, b, n))
     return matrix
 
 
@@ -87,7 +87,11 @@ def menu(n):
     option = input("-->").strip()
     matrix = []
     if option == '1':
-        matrix = auto_matrix(n)
+        a = input_int("Please input a: ")
+        b = input_int("Please input b: ")
+        if a > b:
+            a, b = b, a
+        matrix = auto_matrix(a, b, n)
     elif option == '2':
         matrix = fill_matrix_by_rows(n)
     elif option == '3':
