@@ -213,8 +213,10 @@ def search_in_matrix(matrix, element, end=None, start=None):
         end = [rows - 1, columns - 1]
 
     ij = start
+    iterations = 0
     while start <= end:
         ij = get_middle_in_matrix(start, end, columns)
+        iterations += 1
         if compare_num_with_string(matrix[ij[0]][ij[1]], element):
             break
         elif compare_num_with_string(matrix[ij[0]][ij[1]], element, lambda a, b: a > b):
@@ -223,16 +225,17 @@ def search_in_matrix(matrix, element, end=None, start=None):
             start = move_matrix_index(ij, 1, columns)
     if start > end:
         ij = [-1, -1]
-    return ij[0], ij[1]
+    return ij[0], ij[1], iterations
 
 
 def search(matrix):
     element = input("Enter the element: ")
-    i, j = search_in_matrix(matrix, element)
+    i, j, it = search_in_matrix(matrix, element)
     if i == -1 or j == -1:
         print("There is no such element!")
     else:
         print(f"Element in [{i}][{j}]")
+    print(f"Search iterations: {it}")
     menu(menu_search, matrix, "Please choose what to do:")
 
 
