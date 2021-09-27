@@ -1,0 +1,52 @@
+import LinkedList as List
+import CustomInput as Input
+
+
+def get_menu_option(message=""):
+    print(message)
+    return input("-->").strip()
+
+
+def invalid_option(*_):
+    print("Invalid choice!!")
+    raise ValueError("Invalid menu option")
+
+
+def menu(template, data=None, greet_message='', message_for_get=''):
+    print(greet_message)
+    for key in template:
+        print(f"{key}: {template[key][0]}")
+    option = get_menu_option(message_for_get)
+    try:
+        return template.get(option, [None, invalid_option])[1](data)
+    except ValueError:
+        return menu(template, data, greet_message, message_for_get)
+
+
+def close(*_):
+    exit()
+
+
+def list_manually(*_):
+    """Input linked list from console"""
+    print("Please input separation element:")
+    sep = input("-->")
+    res = List.LinkedList.empty()
+    print("Input elements: ")
+    res.input_from_console(sep)
+    return res
+
+
+def list_from_range(*_):
+    n = Input.input_upper_zero_num("Input N: ")
+    range_ = [x for x in Input.input_range()]
+    res = List.LinkedList.empty()
+    res.append_random(n, range_)
+    return res
+
+
+input_list = {
+    "1": ("Generate from range", list_from_range),
+    "2": ("Input manually", list_manually),
+    "3": ("Exit", close)
+}
