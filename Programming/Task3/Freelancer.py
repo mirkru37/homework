@@ -28,6 +28,9 @@ class Freelancer:
         """init all data from str. Data must be separated by space"""
         str = str.replace('\t', " ").split(" ")
         str = [i for i in str if i.strip()]  # remove spaces
+        if len(str)-1 == cls.__count_of_fields:
+            # case when split as [... "BE", "Developer"]
+            str[cls.__count_of_fields-1:len(str)] = [" ".join(str[cls.__count_of_fields-1:len(str)])]
         if len(str) != cls.__count_of_fields:
             raise ValueError("Invalid amount of data!!!")
         return cls(str[0], str[1], str[2], str[3], str[4], str[5], str[6])

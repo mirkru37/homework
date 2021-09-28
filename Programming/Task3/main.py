@@ -1,8 +1,13 @@
+import Freelancer
 import Validation as Valid
 import FreelancerCollection
-from fuzzywuzzy import fuzz
+import sys
 
-Str1 = "1234"
-Str2 = ""
-Ratio = fuzz.partial_ratio(Str1.lower(),Str2.lower())
-print(Ratio)
+a = FreelancerCollection.FreelancerCollection()
+a.link_to_file("text.txt")
+a.read_from_file("test.txt")
+a.sort()
+print(a)
+i = a.get_index(lambda f: f.id == "1551")
+a.edit(i, "name", "DSds")
+print(a)
