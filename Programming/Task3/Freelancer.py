@@ -1,73 +1,86 @@
+import Format
+import Validation
+
+
 class Freelancer:
 
-    def __inti__(self, id_, name, email, phone_number, availability, salary, position):
+    def __init__(self, id_, name, email, phone_number, availability, salary, position):
         self.id = id_
         self.name = name
         self.email = email
         self.phone_number = phone_number
-        self.availability = availability
+        self.availability = availability  # hr/week
         self.salary = salary
         self.position = position
 
     @property
     def id(self):
-        return self.id
+        return self.__id
 
     @id.setter
     def id(self, value):
-        # valid
-        self.id = value
+        if not Validation.is_id(value):
+            raise ValueError("Invalid ID")
+        self.__id = value
 
     @property
     def name(self):
-        return self.name
+        return self.__name
 
     @name.setter
     def name(self, value):
-        # valid
-        self.name = value
+        value = Format.name(value)
+        if not Validation.is_name(value):
+            raise ValueError("Invalid name")
+        self.__name = value
 
     @property
     def email(self):
-        return self.email
+        return self.__email
 
     @email.setter
     def email(self, value):
-        # valid
-        self.email = value
+        if not Validation.is_email(value):
+            raise ValueError("Invalid email")
+        self.__email = value
 
     @property
     def phone_number(self):
-        return self.phone_number
+        return self.__phone_number
 
     @phone_number.setter
     def phone_number(self, value):
-        # valid
-        self.phone_number = value
+        if not Validation.is_phone_number(value):
+            raise ValueError("Invalid phone number")
+        self.__phone_number = value
 
     @property
     def availability(self):
-        return self.availability
+        return self.__availability
 
     @availability.setter
     def availability(self, value):
-        # valid
-        self.availability = value
+        if not Validation.is_availability(value):
+            raise ValueError("Invalid availability")
+        self.__availability = int(value)
 
     @property
     def salary(self):
-        return self.salary
+        return self.__salary
 
     @salary.setter
     def salary(self, value):
-        # valid
-        self.salary = value
+        if not Validation.is_salary(value):
+            raise ValueError("Invalid Salary")
+        self.__salary = float(value)
 
     @property
     def position(self):
-        return self.position
+        return self.__position
 
     @position.setter
     def position(self, value):
-        # valid
-        self.position = value
+        value = Validation.get_valid_position(value)
+        if value is None:
+            raise ValueError("Invalid Position")
+        self.__position = value
