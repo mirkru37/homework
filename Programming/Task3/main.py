@@ -1,5 +1,8 @@
 import Validation as Valid
-import Freelancer
+import FreelancerCollection
+from fuzzywuzzy import fuzz
 
-a = Freelancer.Freelancer("1222", "Name", '2.@lnu.edu.edu', '+71234567890', 24, 2, 'devops')
-print(a.position)
+Str1 = "1234"
+Str2 = ""
+Ratio = fuzz.partial_ratio(Str1.lower(),Str2.lower())
+print(Ratio)
