@@ -269,7 +269,7 @@ menu_fill = {
 
 menu_search = {
     "1": ("Search", search),
-    "2": ("Exit", close),
+    "2": ("Exit", close)
 }
 
 n = input_upper_zero_int("Please input N: ")
