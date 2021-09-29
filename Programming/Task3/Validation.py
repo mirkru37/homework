@@ -75,3 +75,11 @@ def is_number(value):
 
 def is_in_range(val, min, max):
     return min <= val <= max
+
+
+def is_path(path):
+    try:
+        open(path)
+        return True
+    except FileNotFoundError:
+        return False

@@ -73,3 +73,11 @@ def int_(message=""):
         return int(n)
     print("Invalid number!!!")
     return int_(message)
+
+
+def file_path(message=""):
+    path = input(message)
+    if Validation.is_path(path):
+        return path
+    print("Invalid path!!!")
+    return file_path(message)

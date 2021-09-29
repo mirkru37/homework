@@ -1,13 +1,6 @@
-import Freelancer
-import Validation as Valid
+import Input
+import Menu
 import FreelancerCollection
-import sys
 
-a = FreelancerCollection.FreelancerCollection()
-a.link_to_file("text.txt")
-a.read_from_file("test.txt")
-a.sort()
-print(a)
-i = a.get_index(lambda f: f.id == "1551")
-a.edit(i, "name", "DSds")
-print(a)
+a = Menu.menu(Menu.input_freelance_collection)
+Menu.menu(Menu.all_ways, a)

@@ -61,7 +61,7 @@ class FreelancerCollection:
             except ValueError as e:
                 print(e)
 
-    def search_all(self, val, ratio=80):
+    def find_all(self, val, ratio=80):
         res = []
         for i in self.__freelancers:
             fields = i.get_all_fields()
@@ -87,6 +87,9 @@ class FreelancerCollection:
 
     def edit(self, index, what, value):
         if what == "id":
+            IDs = [i.id for i in self.__freelancers]
+            if value in IDs:
+                raise ValueError("There already is a member with such ID")
             self.__freelancers[index].id = value
         elif what == "name":
             self.__freelancers[index].name = value
@@ -103,8 +106,9 @@ class FreelancerCollection:
         self.update_file()
 
     def link_to_file(self, path):
-        self.__file = open(path, "w")
+        self.__file = open(path, "a")
         self.__link_to_file = True
+        self.update_file()
 
     def unlink_from_file(self):
         if self.__file:
