@@ -21,26 +21,19 @@ class Freelancer:
     def init_from_console(cls, message=""):
         if message:
             print(message)
-        return cls(Input.id(), Input.name(), Input.email(), Input.phone_number(), Input.availability(), Input.salary(), Input.position())
+        return cls(*Input.all_fields(Input.freelancer_fields))
 
     @classmethod
-    def init_from_str(cls, str):
+    def init_from_str(cls, str_):
         """init all data from str. Data must be separated by space"""
-        str = str.replace('\t', " ").split(" ")
-        str = [i for i in str if i.strip()]  # remove spaces
-        if len(str)-1 == cls.__count_of_fields:
+        str_ = str_.replace('\t', " ").split(" ")
+        str_ = [i for i in str_ if i.strip()]  # remove spaces
+        if len(str_) - 1 == cls.__count_of_fields:
             # case when split as [... "BE", "Developer"]
-            str[cls.__count_of_fields-1:len(str)] = [" ".join(str[cls.__count_of_fields-1:len(str)])]
-        if len(str) != cls.__count_of_fields:
+            str_[cls.__count_of_fields - 1:len(str_)] = [" ".join(str_[cls.__count_of_fields - 1:len(str_)])]
+        if len(str_) != cls.__count_of_fields:
             raise ValueError("Invalid amount of data!!!")
-        return cls(str[0], str[1], str[2], str[3], str[4], str[5], str[6])
-        # self.id = str[0]
-        # self.name = str[1]
-        # self.email = str[2]
-        # self.phone_number = str[3]
-        # self.availability = str[4]  # hr/week
-        # self.salary = str[5]
-        # self.position = str[6]
+        return cls(*str_)
 
     @property
     def id(self):
@@ -100,7 +93,7 @@ class Freelancer:
     def salary(self, value):
         if not Validation.is_salary(value):
             raise ValueError("Invalid Salary")
-        self.__salary = float(value)
+        self.__salary = round(float(value), 2)
 
     @property
     def position(self):
@@ -115,4 +108,4 @@ class Freelancer:
 
     def get_all_fields(self):
         """returns all fields of class as array in initialization order"""
-        return [self.__id, self.__name, self.__email, self.__phone_number, self.__availability, self.__salary, self.__position]
+        return [x for x in vars(self).values()]

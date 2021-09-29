@@ -13,13 +13,18 @@ class FreelancerCollection:
     def __str__(self):
         if not self.__freelancers:
             return "There is no elements yet"
-        str_ = "ID\tName\tEmail\tPhone number\thr/week\tsalary\tposition"
+        str_ = ""
+        for i in vars(self.__freelancers[0]).keys():
+            str_ += i.split("__")[-1].capitalize() + "\t"
         for i in self.__freelancers:
             str_ += "\n" + str(i)
         return str_
 
     def __getitem__(self, item):
         return self.__freelancers[item]
+
+    def __len__(self):
+        return len(self.__freelancers)
 
     def add(self, freelancer):
         if type(freelancer) != Freelancer.Freelancer:
@@ -52,7 +57,10 @@ class FreelancerCollection:
 
     def read_from_console(self):
         n = Input.upper(0, "Input count of elements: ")
-        print("ID\tName\tEmail\tPhone number\thr/week\tsalary\tposition")
+        str_ = ""
+        for i in vars(self.__freelancers[0]).keys():
+            str_ += i.split("__")[-1].capitalize() + "\t"
+        print(str_)
         i = 0
         while i < n:
             try:
@@ -85,24 +93,13 @@ class FreelancerCollection:
                 return i
         return -1
 
-    def edit(self, index, what, value):
-        if what == "id":
+    def edit(self, index, what):
+        value = Input.field(Input.freelancer_fields, what)
+        if what == "_Freelancer__id":
             IDs = [i.id for i in self.__freelancers]
             if value in IDs:
                 raise ValueError("There already is a member with such ID")
-            self.__freelancers[index].id = value
-        elif what == "name":
-            self.__freelancers[index].name = value
-        elif what == "email":
-            self.__freelancers[index].email = value
-        elif what == "phone":
-            self.__freelancers[index].phone_number = value
-        elif what == "hours":
-            self.__freelancers[index].availability = value
-        elif what == "salary":
-            self.__freelancers[index].salary = value
-        elif what == "position":
-            self.__freelancers[index].position = value
+        setattr(self.__freelancers[index], what, value)
         self.update_file()
 
     def link_to_file(self, path):

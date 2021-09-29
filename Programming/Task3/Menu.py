@@ -1,5 +1,6 @@
 import FreelancerCollection
 import Input
+import Tools
 
 
 def get_menu_option(message=""):
@@ -60,51 +61,42 @@ def collection_show(collection, *_):
 
 
 def collection_sort(collection, *_):
-    print("Sort by?")
-    print("1-ID", "2-Name", "3-Email", "4-Phone", "5-Hours per week", "6-Salary", "7-Position", "...-back")
-    option = get_menu_option()
-    if option == "1":
-        collection.sort(lambda a: a.id)
-    elif option == "2":
-        collection.sort(lambda a: a.name.lower())
-    elif option == "3":
-        collection.sort(lambda a: a.email.lower())
-    elif option == "4":
-        collection.sort(lambda a: a.phone_number)
-    elif option == "5":
-        collection.sort(lambda a: str(a.availability))
-    elif option == "6":
-        collection.sort(lambda a: str(a.salary))
-    elif option == "7":
-        collection.sort(lambda a: a.position.lower())
+    if len(collection) != 0:
+        print("Sort by?")
+        i, option = get_menu_option_and_fields(collection[0])
+        if option == i:
+            exit()
+        collection.sort(lambda b: str(Tools.get_attr(b, option-1)).lower() if
+                                      type(Tools.get_attr(b, option-1)) is str
+                                      else Tools.get_attr(b, option-1))
+    else:
+        print("Empty list!!!")
     menu(all_ways, collection)
 
 
 def collection_delete(collection, *_):
-    print("Delete by?")
-    print("1-ID", "2-Name", "3-Email", "4-Phone", "5-Hours per week", "6-Salary", "7-Position", "...-back")
-    option = get_menu_option()
-    what = input("Input identifier: ")
-    if option == "1":
-        collection.delete(lambda a: a.id.lower() != what)
-    elif option == "2":
-        collection.delete(lambda a: a.name.lower() != what)
-    elif option == "3":
-        collection.delete(lambda a: a.email.lower() != what)
-    elif option == "4":
-        collection.delete(lambda a: a.phone_number != what)
-    elif option == "5":
-        collection.delete(lambda a: str(a.availability) != what)
-    elif option == "6":
-        collection.delete(lambda a: str(a.salary) != what)
-    elif option == "7":
-        collection.delete(lambda a: a.position.lower() != what)
+    if len(collection) != 0:
+        print("Delete by?")
+        i, option = get_menu_option_and_fields(collection[0])
+        if option == i:
+            exit()
+        what = input("Input value: ")
+        collection.delete(lambda b: str(Tools.get_attr(b, option - 1)).lower() != what.lower())
+    else:
+        print("Empty list!!!")
     menu(all_ways, collection)
 
 
 def collection_add(collection, *_):
     collection.read_from_console()
     menu(all_ways, collection)
+
+
+def get_menu_option_and_fields(val):
+    i = Tools.print_fields(val) + 1
+    print(f"{i}-Back")
+    option = Input.between(1, i, "-->")
+    return i, option
 
 
 def collection_edit(collection, *_):
@@ -116,26 +108,13 @@ def collection_edit(collection, *_):
         menu(all_ways, collection)
         return
     print("Choose what to edit:")
-    print("1-ID", "2-Name", "3-Email", "4-Phone", "5-Hours per week", "6-Salary", "7-Position", "...-back")
-    option = get_menu_option()
-    if option == "1":
+    i, option = get_menu_option_and_fields(collection[0])
+    if option != i:
         try:
-            collection.edit(index, "id", Input.id())
+            collection.edit(index, Tools.get_attr_name(collection[0], option-1))
         except ValueError as e:
             print(e)
             collection_edit(collection)
-    elif option == "2":
-        collection.edit(index, "name", Input.name())
-    elif option == "3":
-        collection.edit(index, "email", Input.email())
-    elif option == "4":
-        collection.edit(index, "phone", Input.phone_number())
-    elif option == "5":
-        collection.edit(index, "hours", Input.availability())
-    elif option == "6":
-        collection.edit(index, "salary", Input.salary())
-    elif option == "7":
-        collection.edit(index, "position", Input.position())
     menu(all_ways, collection)
 
 

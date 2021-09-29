@@ -38,7 +38,7 @@ def phone_number():
 def availability():
     av = input("Input availability(hr/week): ")
     if Validation.is_availability(av):
-        return av
+        return int(av)
     print("Invalid hours!!!")
     return availability()
 
@@ -46,7 +46,7 @@ def availability():
 def salary():
     sal = input("Input salary: ")
     if Validation.is_salary(sal):
-        return sal
+        return round(float(sal), 2)
     print("Invalid salary!!!")
     return salary()
 
@@ -67,9 +67,22 @@ def upper(min_, message=""):
     return n
 
 
+def between(min_, max_, message=""):
+    if max_ < min_:
+        max_, min_ = min_, max_
+    n = int_(message)
+    if min_ <= n <= max_:
+        return n
+    print("Invalid value")
+    return between(min_, max_, message)
+
+
 def int_(message=""):
-    n = input(message)
-    if n.isdigit():
+    s = input(message)
+    n = s
+    if s[0] in ('-', '+'):
+        s = s[1:]
+    if s.isdigit():
         return int(n)
     print("Invalid number!!!")
     return int_(message)
@@ -81,3 +94,26 @@ def file_path(message=""):
         return path
     print("Invalid path!!!")
     return file_path(message)
+
+
+def field(class_fields, field_):
+    """all_fields - dict with input functions"""
+    return class_fields[field_]()
+
+
+def all_fields(class_fields):
+    res = []
+    for i in class_fields:
+        res.append(class_fields[i]())
+    return res
+
+
+freelancer_fields = {
+    "_Freelancer__id": id,
+    "_Freelancer__name": name,
+    "_Freelancer__email": email,
+    "_Freelancer__phone_number": phone_number,
+    "_Freelancer__availability": availability,
+    "_Freelancer__salary": salary,
+    "_Freelancer__position": position,
+}
