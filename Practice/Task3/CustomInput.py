@@ -11,7 +11,7 @@ def input_int(message):
     return val
 
 
-def input_upper_zero_num(message):
+def input_upper_zero_num(message=""):
     res = input_int(message)
     if res <= 0:
         # raise ValueError("Invalid array size")
@@ -19,6 +19,14 @@ def input_upper_zero_num(message):
         return input_upper_zero_num(message)
     return res
 
+
+def input_index(message=""):
+    res = input_int(message)
+    if res < 0:
+        # raise ValueError("Invalid array size")
+        print("You've entered wrong value. Try again!!")
+        return input_upper_zero_num(message)
+    return res
 
 def input_range():
     a = input("Input A: ")

@@ -70,10 +70,29 @@ class LinkedList:
             self.root.next = temp
         self.__length += 1
 
+    def add_at(self, data, index):
+        if 0 > index or index >= self.__length:
+            if index == self.__length:
+                self.__get_with_index(index - 1).next = self.Node(data)
+                self.__length += 1
+                return
+            raise ValueError("Wrong index")
+        tail = self.Node(self.__get_with_index(index).data)
+        tail.next = self.__get_with_index(index).next
+        current = self.root
+        if index != 0:
+            current = self.__get_with_index(index)
+        current.assign(self.Node(data))
+        current.next = tail
+        self.__length += 1
+
     def delete_at(self, index):
         """Delete element on "index" position"""
-        current = self.__get_with_index(index)
-        current.assign(current.next)
+        if index == self.__length - 1:
+            self.__get_with_index(index-1).next = None
+        else:
+            current = self.__get_with_index(index)
+            current.assign(current.next)
         self.__length -= 1
 
     def input_from_console(self, sep=" "):
