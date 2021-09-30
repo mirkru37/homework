@@ -68,6 +68,13 @@ def list_delete(list_, *_):
     menu(do, list_)
 
 
+def list_swap(list_, *_):
+    print("Before: ", list_)
+    list_.half_swap()
+    print("After: ", list_)
+    menu(do, list_)
+
+
 input_list = {
     "1": ("Generate from range", list_from_range),
     "2": ("Input manually", list_manually),
@@ -77,5 +84,6 @@ input_list = {
 do = {
     "1": ("Add to i", list_add),
     "2": ("Delete at i", list_delete),
-    "3": ("Exit", close)
+    "3": ("Swap", list_swap),
+    "4": ("Exit", close)
 }
