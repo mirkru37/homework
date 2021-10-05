@@ -68,7 +68,7 @@ class FreelancerCollection:
     def read_from_console(self):
         n = Input.upper(0, "Input count of elements: ")
         str_ = ""
-        for i in vars(self.__freelancers[0]).keys():
+        for i in vars(Freelancer.Freelancer.init_default()).keys():
             str_ += i.split("__")[-1].capitalize() + "\t"
         print(str_)
         i = 0
