@@ -63,7 +63,7 @@ def collection_show(collection, *_):
 def collection_sort(collection, *_):
     if len(collection) != 0:
         print("Sort by?")
-        i, option = get_menu_option_and_fields(collection[0])
+        i, option = get_menu_option_from_fields(collection[0])
         if option == i:
             exit()
         collection.sort(lambda b: str(Tools.get_attr(b, option-1)).lower() if
@@ -77,7 +77,7 @@ def collection_sort(collection, *_):
 def collection_delete(collection, *_):
     if len(collection) != 0:
         print("Delete by?")
-        i, option = get_menu_option_and_fields(collection[0])
+        i, option = get_menu_option_from_fields(collection[0])
         if option == i:
             exit()
         what = input("Input value: ")
@@ -92,7 +92,7 @@ def collection_add(collection, *_):
     menu(all_ways, collection)
 
 
-def get_menu_option_and_fields(val):
+def get_menu_option_from_fields(val):
     i = Tools.print_fields(val) + 1
     print(f"{i}-Back")
     option = Input.between(1, i, "-->")
@@ -108,7 +108,7 @@ def collection_edit(collection, *_):
         menu(all_ways, collection)
         return
     print("Choose what to edit:")
-    i, option = get_menu_option_and_fields(collection[0])
+    i, option = get_menu_option_from_fields(collection[0])
     if option != i:
         try:
             collection.edit(index, Tools.get_attr_name(collection[0], option-1))

@@ -79,11 +79,8 @@ def between(min_, max_, message=""):
 
 def int_(message=""):
     s = input(message)
-    n = s
-    if s[0] in ('-', '+'):
-        s = s[1:]
-    if s.isdigit():
-        return int(n)
+    if Validation.is_int(s):
+        return int(s)
     print("Invalid number!!!")
     return int_(message)
 

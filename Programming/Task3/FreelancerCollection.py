@@ -1,3 +1,4 @@
+import Format
 import Freelancer
 import Input
 from fuzzywuzzy import fuzz
@@ -29,7 +30,19 @@ class FreelancerCollection:
     def add(self, freelancer):
         if type(freelancer) != Freelancer.Freelancer:
             if type(freelancer) == str:
-                freelancer = Freelancer.Freelancer.init_from_str(freelancer)
+                dummy = Freelancer.Freelancer.init_default()
+                freelancer = Format.freelancer_fields(freelancer)
+                if len(freelancer) != dummy.count_of_fields:
+                    raise ValueError("Invalid amount of data!!!")
+                exception_message = ""
+                for i, field in enumerate(vars(dummy).keys()):
+                    try:
+                        setattr(dummy, field.split("__")[-1], freelancer[i])
+                    except ValueError as e:
+                        exception_message += str(e) + "\n"
+                if exception_message:
+                    raise ValueError(exception_message)
+                freelancer = dummy
             else:
                 raise ValueError("Invalid input data!!!")
         IDs = [i.id for i in self.__freelancers]
@@ -42,17 +55,14 @@ class FreelancerCollection:
     def read_from_file(self, path):
         file = open(path)
         line = file.readline().rstrip()
-        unread = 0
         lines_count = 0
         while line:
             lines_count += 1
             try:
                 self.add(line)
-            except ValueError:
-                unread += 1
+            except ValueError as e:
+                print(f"Error at line {lines_count}\n", e)
             line = file.readline().rstrip()
-        if unread:
-            print(f"{unread} of {lines_count} was ignored")
         file.close()
 
     def read_from_console(self):
@@ -76,6 +86,7 @@ class FreelancerCollection:
             for j in fields:
                 if fuzz.partial_ratio(str(j).lower(), str(val).lower()) >= ratio:
                     res.append(str(i))
+                    break
         return res
 
     def sort(self, compare=lambda a: a.id):
@@ -87,7 +98,9 @@ class FreelancerCollection:
         self.update_file()
 
     def get_index(self, where):
-        """return index of element we want to edit"""
+        """return index of element we want to edit
+            where is a lambda for comparison
+        """
         for i, freelancer in enumerate(self.__freelancers):
             if where(freelancer):
                 return i
