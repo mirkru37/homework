@@ -41,7 +41,9 @@ def list_from_range(*_):
     n = Input.input_upper_zero_num("Input N: ")
     range_ = [x for x in Input.input_range()]
     res = List.LinkedList.empty()
-    res.append_random(n, range_)
+    generator = res.append_random(range_)
+    for _ in range(n):
+        next(generator)
     return res
 
 

@@ -16,6 +16,8 @@ class LinkedList:
     def __init__(self, data):
         self.root = None
         self.__length = 0
+        self.__iter_element = None
+        self.__count_of_iter = 0
         if data is not None:
             self.add(data)
 
@@ -42,6 +44,22 @@ class LinkedList:
 
     def __len__(self):
         return self.__length
+
+    def __next__(self):
+        if self.__count_of_iter < self.__length:
+            self.__count_of_iter += 1
+            if self.__iter_element is not None:
+                self.__iter_element = self.__iter_element.next
+            elif self.root:
+                self.__iter_element = self.root
+        else:
+            self.__count_of_iter = 0
+            self.__iter_element = None
+            raise StopIteration
+        return self.__iter_element.data
+
+    def __iter__(self):
+        return self
 
     def __get_with_index(self, index):
         index = self.__correct_index(index)
@@ -110,10 +128,11 @@ class LinkedList:
         except TypeError:
             self.add(data)
 
-    def append_random(self, size, range_):
+    def append_random(self, range_):
         """Appends list with random values from "range_" """
-        for i in range(size):
+        while True:
             self.add(choice(range_))
+            yield 1
 
     def half_swap(self):
         """Swaps right and left sides of list"""
