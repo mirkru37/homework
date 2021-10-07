@@ -50,8 +50,8 @@ def is_id(func):
         if exception:
             exception += "]"
             raise ValueError(exception)
-        return func(self, *args)
-
+        if func:
+            return func(self, *args)
     return inner
 
 

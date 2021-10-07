@@ -1,6 +1,3 @@
 2222 Denial denialmazepa@gmail.com +380546753456 6 440.0 DevOps
-15525 Denial denialmazepa@gmail.com +380546753456 6 440.0 DevOOps
-1331 Marko mazepaukr.net +78475639567 6 500.0 BE Developer
-1531 Oleg shalapski@gmail.com 48685636563 6 200.0 FE Developer
-1231 Roman mirkr37@gmail.com +380682017118 -1 300.0 DevOps
-1553 denial denialmazepa@gmail.com +380546753456 6 -1 DevOps
+2212 Дем'ян denialmazepa@gmail.com +380546753456 6 440.35 BE Developer
+1235 Roman e-mail@mail.com +380682017118 10 100000000.0 DevOps

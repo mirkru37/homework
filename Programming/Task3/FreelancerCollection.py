@@ -107,13 +107,17 @@ class FreelancerCollection:
         return -1
 
     def edit(self, index, what):
-        value = Input.field(Input.freelancer_fields, what)
-        if what == "_Freelancer__id":
+        what = what.split("__")[-1]
+        value = input(f"Input {what}: ")
+        if what == "id":
             IDs = [i.id for i in self.__freelancers]
             if value in IDs:
                 raise ValueError("There already is a member with such ID")
-        setattr(self.__freelancers[index], what, value)
-        self.update_file()
+        try:
+            setattr(self.__freelancers[index], what, value)
+            self.update_file()
+        except ValueError as e:
+            print(e.__str__())
 
     def link_to_file(self, path):
         self.__file = open(path, "a")

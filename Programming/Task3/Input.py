@@ -3,6 +3,16 @@ import Format
 
 
 # Fields
+def id():
+    id_ = input("Input id:")
+    valid = Validation.is_id(None)
+    try:
+        valid(None, id_)
+        return id_
+    except ValueError:
+        print("Invalid Id")
+        return id()
+
 
 # general
 def upper(min_, message=""):
@@ -48,5 +58,3 @@ def all_fields(class_fields):
     for i in class_fields:
         res.append(class_fields[i]())
     return res
-
-
