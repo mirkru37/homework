@@ -1,7 +1,13 @@
+from copy import deepcopy
+
 import Format
 import Freelancer
 import Input
-from fuzzywuzzy import fuzz
+from Memento import Memento
+from Caretaker import Caretaker
+
+
+# from fuzzywuzzy import fuzz
 
 
 class FreelancerCollection:
@@ -10,6 +16,8 @@ class FreelancerCollection:
         self.__file = None
         self.__link_to_file = False
         self.__freelancers = []
+        self.__caretaker_freelancers = Caretaker()
+        self.__save_exceptions = ["_FreelancerCollection__caretaker_freelancers", "_FreelancerCollection__file", "_FreelancerCollection__link_to_file"]
 
     def __str__(self):
         if not self.__freelancers:
@@ -28,6 +36,7 @@ class FreelancerCollection:
         return len(self.__freelancers)
 
     def add(self, freelancer):
+        self.save()
         if type(freelancer) != Freelancer.Freelancer:
             if type(freelancer) == str:
                 dummy = Freelancer.Freelancer.init_default()
@@ -90,10 +99,12 @@ class FreelancerCollection:
         return res
 
     def sort(self, compare=lambda a: a.id):
+        self.save()
         self.__freelancers = sorted(self.__freelancers, key=compare)
         self.update_file()
 
     def delete(self, exception):
+        self.save()
         self.__freelancers = list(filter(exception, self.__freelancers))
         self.update_file()
 
@@ -107,6 +118,7 @@ class FreelancerCollection:
         return -1
 
     def edit(self, index, what):
+        self.save()
         value = Input.field(Input.freelancer_fields, what)
         if what == "_Freelancer__id":
             IDs = [i.id for i in self.__freelancers]
@@ -131,6 +143,38 @@ class FreelancerCollection:
             for i in self.__freelancers:
                 self.__file.write(str(i) + "\n")
 
+    def save(self):
+        items_to_save = self.__get_attrs_to_save()
+        self.__caretaker_freelancers.save(Memento(**items_to_save))
+
+    def undo(self):
+        items_to_save = self.__get_attrs_to_save()
+        try:
+            previous = self.__caretaker_freelancers.undo(Memento(**items_to_save))
+        except IndexError:
+            print("The undo stack is empty")
+            return
+        self.__dict__.update(vars(previous))
+        self.update_file()
+
+    def redo(self):
+        items_to_save = self.__get_attrs_to_save()
+        try:
+            previous = self.__caretaker_freelancers.redo(Memento(**items_to_save))
+        except IndexError:
+            print("The undo stack is empty")
+            return
+        self.__dict__.update(vars(previous))
+        self.update_file()
+
     def __clear_file(self):
         self.__file.seek(0)
         self.__file.truncate()
+
+    def __get_attrs_to_save(self):
+        res = deepcopy(vars(self))
+        for key in self.__save_exceptions:
+            res.pop(key)
+        return res
+
+

@@ -66,9 +66,9 @@ def collection_sort(collection, *_):
         i, option = get_menu_option_from_fields(collection[0])
         if option == i:
             exit()
-        collection.sort(lambda b: str(Tools.get_attr(b, option-1)).lower() if
-                                      type(Tools.get_attr(b, option-1)) is str
-                                      else Tools.get_attr(b, option-1))
+        collection.sort(lambda b: str(Tools.get_attr(b, option - 1)).lower() if
+        type(Tools.get_attr(b, option - 1)) is str
+        else Tools.get_attr(b, option - 1))
     else:
         print("Empty list!!!")
     menu(all_ways, collection)
@@ -92,6 +92,16 @@ def collection_add(collection, *_):
     menu(all_ways, collection)
 
 
+def collection_undo(collection, *_):
+    collection.undo()
+    menu(all_ways, collection)
+
+
+def collection_redo(collection, *_):
+    collection.redo()
+    menu(all_ways, collection)
+
+
 def get_menu_option_from_fields(val):
     i = Tools.print_fields(val) + 1
     print(f"{i}-Back")
@@ -111,7 +121,7 @@ def collection_edit(collection, *_):
     i, option = get_menu_option_from_fields(collection[0])
     if option != i:
         try:
-            collection.edit(index, Tools.get_attr_name(collection[0], option-1))
+            collection.edit(index, Tools.get_attr_name(collection[0], option - 1))
         except ValueError as e:
             print(e)
             collection_edit(collection)
@@ -144,5 +154,7 @@ all_ways = {
     "6": ("Edit element", collection_edit),
     "7": ("Connect to file", connect_to_file),
     "8": ("Disconnect to file", disconnect_to_file),
-    "9": ("Exit", close)
+    "9": ("Undo", collection_undo),
+    "10": ("Redo", collection_redo),
+    "11": ("Exit", close)
 }
