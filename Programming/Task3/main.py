@@ -1,8 +1,11 @@
 import Menu
+import Tools
 from Freelancer import Freelancer
+from FreelancerCollection import FreelancerCollection
 
-a = Menu.menu(Menu.input_freelance_collection)
-Menu.menu(Menu.all_ways, a)
+if __name__ == "__main__":
+    a = Menu.menu(Menu.input_freelance_collection)
+    Menu.menu(Menu.all_ways, a)
 
 # a = Freelancer.init_default()
 #
