@@ -28,6 +28,7 @@ def input_index(message=""):
         return input_upper_zero_num(message)
     return res
 
+
 def input_range():
     a = input("Input A: ")
     b = input("Input B: ")
@@ -39,3 +40,11 @@ def input_range():
         return Tools.char_range(a, b)
     print("Invalid range!!!")
     return input_range()
+
+
+def input_file_path(message=""):
+    path = input(message)
+    if Validation.is_path(path):
+        return path
+    print("Invalid path!!!")
+    return input_file_path(message)

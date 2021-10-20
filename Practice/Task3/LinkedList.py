@@ -1,4 +1,33 @@
+from abc import ABC, abstractmethod
+import CustomInput as Input
 from random import choice
+
+
+class AppendBehaviour(ABC):
+
+    @abstractmethod
+    def append(self, list_):
+        pass
+
+
+class AppendFromRange(AppendBehaviour):
+    def append(self, list_):
+        n = Input.input_index("Input N: ")
+        range_ = [x for x in Input.input_range()]
+        pos = Input.input_index("Input position: ")
+        generator = list_.append_random(range_)
+        for _ in range(n):
+            list_.add_at(next(generator), pos)
+
+
+class AppendFromFile(AppendBehaviour):
+    def append(self, list_):
+        pos = Input.input_index("Input position: ")
+        path = Input.input_file_path("Input file path: ")
+        file = open(path)
+        for line in file.readlines():
+            for i in line.split(" "):
+                list_.add_at(i, pos)
 
 
 class LinkedList:
@@ -13,18 +42,19 @@ class LinkedList:
             self.data = node.data
             self.next = node.next
 
-    def __init__(self, data):
+    def __init__(self, data=None):
         self.root = None
         self.__length = 0
         self.__iter_element = None
         self.__count_of_iter = 0
+        self.__append_behaviour = AppendFromRange()
         if data is not None:
             self.add(data)
 
-    @classmethod
-    def empty(cls):
-        """Create empty list"""
-        return cls(None)
+    # @classmethod
+    # def empty(cls):
+    #     """Create empty list"""
+    #     return cls(None)
 
     def __str__(self):
         res = []
@@ -80,6 +110,14 @@ class LinkedList:
         """Returns length of list"""
         return self.__length
 
+    @property
+    def append_behaviour(self):
+        return self.__append_behaviour
+
+    @append_behaviour.setter
+    def append_behaviour(self, behaviour):
+        self.__append_behaviour = behaviour
+
     def add(self, data):
         """Add element at the front of list"""
         temp = self.root
@@ -91,8 +129,11 @@ class LinkedList:
     def add_at(self, data, index):
         if 0 > index or index >= self.__length:
             if index == self.__length:
-                self.__get_with_index(index - 1).next = self.Node(data)
-                self.__length += 1
+                if self.__length == 0:
+                    self.add(data)
+                else:
+                    self.__get_with_index(index - 1).next = self.Node(data)
+                    self.__length += 1
                 return
             raise ValueError("Wrong index")
         tail = self.Node(self.__get_with_index(index).data)
@@ -107,32 +148,34 @@ class LinkedList:
     def delete_at(self, index):
         """Delete element on "index" position"""
         if index == self.__length - 1:
-            self.__get_with_index(index-1).next = None
+            self.__get_with_index(index - 1).next = None
         else:
             current = self.__get_with_index(index)
             current.assign(current.next)
         self.__length -= 1
 
-    def input_from_console(self, sep=" "):
-        """Read element from console, divided by "sep=" """
-        array = input()
-        array = array.split(sep)
-        self.append(array)
+    # def input_from_console(self, sep=" "):
+    #     """Read element from console, divided by "sep=" """
+    #     array = input()
+    #     array = array.split(sep)
+    #     self.append(array)
 
-    def append(self, data):
-        """Adds array of single object to front"""
-        try:
-            if len(data) >= 1:
-                for i in reversed(data):
-                    self.add(i)
-        except TypeError:
-            self.add(data)
+    def append(self):
+        self.__append_behaviour.append(self)
 
-    def append_random(self, range_):
+    def delete_range(self, a, b):
+        if b >= self.__length:
+            raise ValueError("Incorrect value!!")
+        if a == 0:
+            self.root = self.__get_with_index(b).next
+        else:
+            self.__get_with_index(a-1).next = self.__get_with_index(b).next
+
+    @staticmethod
+    def append_random(range_):
         """Appends list with random values from "range_" """
         while True:
-            self.add(choice(range_))
-            yield 1
+            yield choice(range_)
 
     def half_swap(self):
         """Swaps right and left sides of list"""
