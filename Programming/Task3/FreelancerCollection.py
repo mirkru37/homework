@@ -1,13 +1,10 @@
 from copy import deepcopy
-
 import Format
 import Freelancer
 import Input
 from Memento import Memento
 from Caretaker import Caretaker
-
-
-# from fuzzywuzzy import fuzz
+from fuzzywuzzy import fuzz
 
 
 class FreelancerCollection:
@@ -17,7 +14,8 @@ class FreelancerCollection:
         self.__link_to_file = False
         self.__freelancers = []
         self.__caretaker_freelancers = Caretaker()
-        self.__save_exceptions = ["_FreelancerCollection__caretaker_freelancers", "_FreelancerCollection__file", "_FreelancerCollection__link_to_file"]
+        self.__save_exceptions = ["_FreelancerCollection__caretaker_freelancers", "_FreelancerCollection__file",
+                                  "_FreelancerCollection__link_to_file"]
 
     def __str__(self):
         if not self.__freelancers:
@@ -172,9 +170,5 @@ class FreelancerCollection:
         self.__file.truncate()
 
     def __get_attrs_to_save(self):
-        res = deepcopy(vars(self))
-        for key in self.__save_exceptions:
-            res.pop(key)
+        res = {x: vars(self)[x] for x in vars(self) if x not in self.__save_exceptions} # problem with copy of not None file !!!!
         return res
-
-
