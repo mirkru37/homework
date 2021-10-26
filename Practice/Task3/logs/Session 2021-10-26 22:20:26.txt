@@ -1,0 +1,5 @@
+Time: 2021-10-26 22:20:43 action: Add from range position: 0 elements_count: 10 list_before: [] list_after: [64, 25, 78, 0, 18, 72, 92, 9, 8, 7]
+Time: 2021-10-26 22:20:57 action: Add from file position: 3 file_path: test.txt list_before: [64, 25, 78, 0, 18, 72, 92, 9, 8, 7] list_after: [64, 25, 78, '1', '1', '1', '1', '1', '1', '1', '1', '1', 0, 18, 72, 92, 9, 8, 7]
+Time: 2021-10-26 22:21:03 action: Delete at position position: 7 list_before: [64, 25, 78, '1', '1', '1', '1', '1', '1', '1', '1', '1', 0, 18, 72, 92, 9, 8, 7] list_after: [64, 25, 78, '1', '1', '1', '1', '1', '1', '1', '1', 0, 18, 72, 92, 9, 8, 7]
+Time: 2021-10-26 22:21:13 action: Delete range begin: 4 end: 9 list_before: [64, 25, 78, '1', '1', '1', '1', '1', '1', '1', '1', 0, 18, 72, 92, 9, 8, 7] list_after: [64, 25, 78, '1', '1', 0, 18, 72, 92, 9, 8, 7]
+Time: 2021-10-26 22:21:33 action: Add from range position: 5 elements_count: 3 list_before: [64, 25, 78, '1', '1', 0, 18, 72, 92, 9, 8, 7] list_after: [64, 25, 78, '1', '1', 5, 4, 8, 0, 18, 72, 92, 9, 8, 7]

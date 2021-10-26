@@ -28,38 +28,6 @@ def close(*_):
     exit()
 
 
-# def list_manually(*_):
-#     """Input linked list from console"""
-#     print("Please input separation element:")
-#     sep = input("-->")
-#     res = List.LinkedList.empty()
-#     print("Input elements: ")
-#     res.input_from_console(sep)
-#     return res
-
-
-# def list_from_range(*_):
-#     n = Input.input_upper_zero_num("Input N: ")
-#     range_ = [x for x in Input.input_range()]
-#     res = List.LinkedList.empty()
-#     generator = res.append_random(range_)
-#     for _ in range(n):
-#         next(generator)
-#     return res
-
-
-# def list_add(list_, *_):
-#     i = Input.input_upper_zero_num("Input i: ")
-#     data = input("Input element: ")
-#     try:
-#         list_.add_at(data, i)
-#     except ValueError as e:
-#         print(e)
-#         return list_add(list_)
-#     print(list_)
-#     menu(do, list_)
-
-
 def list_delete(list_, *_):
     i = Input.input_index("Input i: ")
     try:
@@ -77,12 +45,6 @@ def list_swap(list_, *_):
     print("After: ", list_)
     menu(do, list_)
 
-
-# input_list = {
-#     "1": ("Generate from range", list_from_range),
-#     "2": ("Input manually", list_manually),
-#     "3": ("Exit", close)
-# }
 
 def list_choose_append_with_range(list_, *_):
     list_.append_behaviour = List.AppendFromRange()
