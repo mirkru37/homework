@@ -23,6 +23,7 @@ class FreelancerCollectionTest(unittest.TestCase):
         self.assertRaises(ValueError, local.add, "id name number email avail payment devops")
         self.assertIsNone(local.add("1552 Denial denialmazepa@gmail.com +380546753456 6 440 devops"))
         self.assertEquals(str(local[0]), "1552 Denial denialmazepa@gmail.com +380546753456 6 440.0 DevOps")
+        self.assertEquals(local.get_index(lambda f: f.id == '1552'), 0)
 
     def test_read_file(self):
         local = FreelancerCollection()
@@ -32,6 +33,10 @@ class FreelancerCollectionTest(unittest.TestCase):
         self.assertIsNone(
             local.read_from_file("/home/roman/Desktop/ProgramingHomework/Programming/Task3/test_file.txt"))
         self.assertEquals(local, manual)
+        local = FreelancerCollection()
+        self.assertIsNone(local.read_from_file("/home/roman/Desktop/ProgramingHomework"
+                                                "/Programming/Task3/test_file_error.txt"))
+        self.assertEquals(local[0].__str__(), "1331 Marko mazepa@ukr.net +78475639567 30 500.0 BE Developer")
 
     def test_search(self):
         suggested = ['1531 Oleg shaldenialapski@gmail.com +48685636563 12 200.0 FE Developer',
