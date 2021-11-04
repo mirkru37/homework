@@ -23,6 +23,10 @@ class CarReservation:
         self.name = name
         self.price = price
 
+    def __str__(self):
+        str_ = str(self.__id) + ' ' + str(self.__car) + ' ' + str(self.__start_datetime) + ' ' + str(self.__end_datetime) + ' ' + str(self.__name) + ' ' + str(self.__price)
+        return str_
+
     @property
     def id(self):
         return self.__id

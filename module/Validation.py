@@ -44,7 +44,7 @@ def is_date_less(ceil):
         def inner(self, *args):
             for val in args:
                 if val > ceil:
-                    raise ValueError('Too big date')
+                    raise ValueError(f'Too big date {val} {ceil}')
             if func is not None:
                 return func(self, *args)
             else:
