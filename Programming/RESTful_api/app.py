@@ -2,9 +2,21 @@
 from flask import Flask, jsonify, abort, request
 from flask_mysqldb import MySQL
 from Freelancer import Freelancer
+from flask_swagger_ui import get_swaggerui_blueprint
 
 app = Flask(__name__)
 
+SWAGGER_URL = '/api/v1.0/index'
+API_URL = '/static/swagger.json'
+SWAGGERUI_BLUEPRINT = get_swaggerui_blueprint(
+    SWAGGER_URL,
+    API_URL,
+    config={
+        'app_name': "Freelancer-api"
+    }
+)
+
+app.register_blueprint(SWAGGERUI_BLUEPRINT, url_prefix=SWAGGER_URL)
 app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = ''
 app.config['MYSQL_PASSWORD'] = ''
@@ -31,10 +43,10 @@ def get_freelancers():
         cursor.execute(sql)
         results = cursor.fetchall()
         if len(results) == 0:
-            return jsonify({'status': 404, 'message': "No matches found"})
-        return jsonify({'status': 200, 'data': results})
+            return jsonify({'status': 404, 'message': "No matches found"}), 404
+        return jsonify({'status': 200, 'data': results}), 200
     except Exception as e:
-        return jsonify({'status': 400, 'message': str(e)})
+        return jsonify({'status': 400, 'message': str(e)}), 400
 
 
 @app.route('/api/v1.0/freelancers/<int:id_>', methods=['GET'])
@@ -45,8 +57,8 @@ def get_freelancer(id_):
     results = cursor.fetchall()
     cursor.close()
     if len(results) == 0:
-        return jsonify({'status': 404, 'message': "Freelancer is not found"})
-    return jsonify({'status': 200, 'data': results})
+        return jsonify({'status': 404, 'message': "Freelancer is not found"}), 404
+    return jsonify({'status': 200, 'data': results}), 200
 
 
 @app.route('/api/v1.0/freelancers', methods=['POST'])
@@ -72,31 +84,32 @@ def post_freelancer():
         cursor.execute(sql)
         mysql.connection.commit()
         cursor.close()
-        return jsonify({'status': 200, 'message': "Freelancer has been successfully created."})
+        return jsonify({'status': 200, 'message': "Freelancer has been successfully created."}), 200
     except Exception as e:
-        return jsonify({'status': 400, 'message': str(e)})
+        return jsonify({'status': 400, 'message': str(e)}), 400
 
 
 @app.route('/api/v1.0/freelancers/<int:id_>', methods=['DELETE'])
 def delete_freelancer(id_):
     try:
+        if get_freelancer(id_)[1] == 404:
+            return jsonify({'status': 404, 'message': "Freelancer is not found"}), 404
         cursor = mysql.connection.cursor()
         sql = f"DELETE FROM freelancers WHERE id={id_}"
         cursor.execute(sql)
         mysql.connection.commit()
         cursor.close()
-        return jsonify({'status': 200, 'message': "Freelancer has been successfully deleted."})
+        return jsonify({'status': 200, 'message': "Freelancer has been successfully deleted."}), 200
     except Exception as e:
-        return jsonify({'status': 404, 'message': str(e)})
+        return jsonify({'status': 404, 'message': str(e)}), 404
 
 
 @app.route('/api/v1.0/freelancers/<int:id_>', methods=['PUT'])
 def update_freelancer(id_):
     try:
         # if id is not in table return
-        print(get_freelancer(id_).json)
-        if get_freelancer(id_).json['status'] == 404:
-            return jsonify({'status': 404, 'message': "Freelancer is not found"})
+        if get_freelancer(id_)[1] == 404:
+            return jsonify({'status': 404, 'message': "Freelancer is not found"}), 404
         dummy = Freelancer.init_default()
         exception_message = {}
         for i, field in enumerate(request.json.keys()):
@@ -108,16 +121,16 @@ def update_freelancer(id_):
             raise ValueError(exception_message)
         cursor = mysql.connection.cursor()
         sql = "UPDATE freelancers SET"
+        a = []
         for key, value in request.json.items():
-            sql += f" {key}='{value}' "
-        sql += f"WHERE id={id_}"
-        print(sql)
+            a.append(f" {key}='{value}' ")
+        sql += ', '.join(a) + f" WHERE id={id_}"
         cursor.execute(sql)
         mysql.connection.commit()
         cursor.close()
-        return jsonify({'status': 200, 'message': "Freelancer has been successfully updated."})
+        return jsonify({'status': 200, 'message': "Freelancer has been successfully updated."}), 200
     except Exception as e:
-        return jsonify({'status': 400, 'message': str(e)})
+        return jsonify({'status': 400, 'message': str(e)}), 400
 
 
 if __name__ == '__main__':

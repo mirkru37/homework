@@ -1,0 +1,396 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Freelancer-api",
+    "description": "NULL",
+    "contact": {
+      "email": "mirkru37@gmail.com"
+    },
+    "license": {
+      "name": "Apache 2.0",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+    },
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "/api/v1.0/"
+    }
+  ],
+  "tags": [
+    {
+      "name": "freelancers",
+      "description": "Operations with freelancers database"
+    }
+  ],
+  "paths": {
+    "/freelancers": {
+      "get": {
+        "tags": [
+          "freelancers"
+        ],
+        "summary": "Get list of freelancers",
+        "description": "Returns a list of freelancers from yoyr search parameters",
+        "operationId": "searchFreelancers",
+        "parameters": [
+          {
+            "name": "sort_by",
+            "in": "query",
+            "description": "Column to sort by",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort_type",
+            "in": "query",
+            "description": "asc | desc (default)",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "s",
+            "in": "query",
+            "description": "Search",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Freelancers"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request. It could be invalid sort_by",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FailResponse"
+                },
+                "example": {
+                  "status": 400,
+                  "message": "There is no column \"Surname\""
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No match",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FailResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "freelancers"
+        ],
+        "summary": "Add a new freelancer to list",
+        "operationId": "addFreelancer",
+        "requestBody": {
+          "description": "Freelancer object that needs to be added",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Freelancer"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Succsess"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request. It could be invalid values",
+            "content": {
+              "application/json": {
+                "example": {
+                  "status": 400,
+                  "message": "This id is already in table"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/freelancers/{id}": {
+      "get": {
+        "tags": [
+          "freelancers"
+        ],
+        "summary": "Find freelancer by id",
+        "description": "Returns a single freelancer",
+        "operationId": "getFreelancerById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of freelancer",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "data": {
+                      "allOf": [
+                        {
+                          "$ref": "#/components/schemas/Freelancer"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No match",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FailResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "freelancers"
+        ],
+        "summary": "Delete freelancer",
+        "operationId": "deleteFreelancer",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Freelancer id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Succsess"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No match",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FailResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "freelancers"
+        ],
+        "summary": "Update a freelancer",
+        "operationId": "updateFreelancer",
+        "requestBody": {
+          "description": "Fields needs to be changed",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Freelancer"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of freelancer",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Succsess"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request. It could be invalid values",
+            "content": {
+              "application/json": {
+                "example": {
+                  "status": 400,
+                  "message": "{name: \"Invalid name\"}"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No match",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FailResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Freelancer": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "1234"
+          },
+          "name": {
+            "type": "string",
+            "example": "John"
+          },
+          "email": {
+            "type": "string",
+            "example": "John.Doe@mail.com"
+          },
+          "phone_number": {
+            "type": "string",
+            "example": "+380683046556"
+          },
+          "availability": {
+            "type": "integer",
+            "example": 40
+          },
+          "salary": {
+            "type": "float",
+            "example": 2000
+          },
+          "position": {
+            "type": "string",
+            "example": "DevOps"
+          }
+        }
+      },
+      "Freelancers": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "integer",
+            "example": 200
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Freelancer"
+            }
+          }
+        }
+      },
+      "FailResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "integer",
+            "example": 404
+          },
+          "message": {
+            "type": "string",
+            "example": "Error message"
+          }
+        }
+      }
+    }
+  }
+}
