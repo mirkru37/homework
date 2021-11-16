@@ -16,6 +16,7 @@ def get_freelancers():
         sort_type = request.args.get('sort_type', default='desc')
         s = request.args.get('s')
         all_fr = FreelancerModel.query
+        count = len(all_fr.all())
         if s:
             all_fr = all_fr.filter(
                 or_(
@@ -33,11 +34,14 @@ def get_freelancers():
                 all_fr = all_fr.order_by(sort_by)
             else:
                 all_fr = all_fr.order_by(desc(sort_by))
+        limit, offset = request.args.get('limit', type=int), request.args.get('offset', default=0, type=int)
+        if limit:
+            all_fr = all_fr.offset(offset * limit).limit(limit)
 
         results = freelancers_schema.dump(all_fr.all())
         if len(results) == 0:
             return jsonify({'status': 404, 'message': "No matches found"}), 404
-        return jsonify({'status': 200, 'data': results}), 200
+        return jsonify({'status': 200, 'data': results, 'count': count}), 200
     except Exception as e:
         return jsonify({'status': 400, 'message': str(e)}), 400
 
