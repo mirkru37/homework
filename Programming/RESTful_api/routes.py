@@ -1,17 +1,12 @@
+import werkzeug.exceptions
 from flask import jsonify, request
-
-import sql_query
-from init import *
+from sqlalchemy import or_, desc
+from FreelancerModel import *
 from Freelancer import Freelancer
 
 
-def push_sql(sql, mysql):
-    cursor = mysql.connection.cursor()
-    cursor.execute(sql)
-    res = cursor.fetchall()
-    cursor.close()
-    mysql.connection.commit()
-    return res
+freelancer_schema = FreelancerSchema()
+freelancers_schema = FreelancerSchema(many=True)
 
 
 @app.route('/api/v1.0/freelancers', methods=['GET'])
@@ -20,9 +15,26 @@ def get_freelancers():
         sort_by = request.args.get('sort_by')
         sort_type = request.args.get('sort_type', default='desc')
         s = request.args.get('s')
-        dummy = Freelancer.init_default()
-        sql = sql_query.gen_search('freelancers', [x.split('__')[-1] for x in vars(dummy).keys()], sort_by, sort_type, s)
-        results = push_sql(sql, mysql)
+        all_fr = FreelancerModel.query
+        if s:
+            all_fr = all_fr.filter(
+                or_(
+                    FreelancerModel.id.like(f"%{s}%"),
+                    FreelancerModel.name.like(f"%{s}%"),
+                    FreelancerModel.email.like(f"%{s}%"),
+                    FreelancerModel.phone_number.like(f"%{s}%"),
+                    FreelancerModel.availability.like(f"%{s}%"),
+                    FreelancerModel.salary.like(f"%{s}%"),
+                    FreelancerModel.position.like(f"%{s}%"),
+                ))
+
+        if sort_by:
+            if sort_type.lower() == 'asc':
+                all_fr = all_fr.order_by(sort_by)
+            else:
+                all_fr = all_fr.order_by(desc(sort_by))
+
+        results = freelancers_schema.dump(all_fr.all())
         if len(results) == 0:
             return jsonify({'status': 404, 'message': "No matches found"}), 404
         return jsonify({'status': 200, 'data': results}), 200
@@ -32,8 +44,7 @@ def get_freelancers():
 
 @app.route('/api/v1.0/freelancers/<int:id_>', methods=['GET'])
 def get_freelancer(id_):
-    sql = sql_query.gen_search_by_field('freelancers', 'id', id_)
-    results = push_sql(sql, mysql)
+    results = freelancer_schema.dump(FreelancerModel.query.get(id_))
     if len(results) == 0:
         return jsonify({'status': 404, 'message': "Freelancer is not found"}), 404
     return jsonify({'status': 200, 'data': results}), 200
@@ -53,9 +64,9 @@ def post_freelancer():
                 exception_message[field.split("__")[-1]] = str(e)
         if exception_message:
             raise ValueError(exception_message)
-        sql = "INSERT INTO freelancers (id, name, email, phone_number, availability, salary, position)" \
-             " VALUES (\"{}\", \"{}\", \"{}\", \"{}\", {}, {}, \"{}\");".format(*request.json.values())
-        push_sql(sql, mysql)
+        new_freelancer = FreelancerModel(*vars(dummy).values())
+        db.session.add(new_freelancer)
+        db.session.commit()
         return jsonify({'status': 200, 'message': "Freelancer has been successfully created."}), 200
     except Exception as e:
         return jsonify({'status': 400, 'message': str(e)}), 400
@@ -64,10 +75,9 @@ def post_freelancer():
 @app.route('/api/v1.0/freelancers/<int:id_>', methods=['DELETE'])
 def delete_freelancer(id_):
     try:
-        if get_freelancer(id_)[1] == 404:
-            return jsonify({'status': 404, 'message': "Freelancer is not found"}), 404
-        sql = f"DELETE FROM freelancers WHERE id={id_}"
-        push_sql(sql, mysql)
+        freelancer = FreelancerModel.query.get_or_404(id_)
+        db.session.delete(freelancer)
+        db.session.commit()
         return jsonify({'status': 200, 'message': "Freelancer has been successfully deleted."}), 200
     except Exception as e:
         return jsonify({'status': 404, 'message': str(e)}), 404
@@ -76,9 +86,6 @@ def delete_freelancer(id_):
 @app.route('/api/v1.0/freelancers/<int:id_>', methods=['PUT'])
 def update_freelancer(id_):
     try:
-        # if id is not in table return
-        if get_freelancer(id_)[1] == 404:
-            return jsonify({'status': 404, 'message': "Freelancer is not found"}), 404
         dummy = Freelancer.init_default()
         exception_message = {}
         for i, field in enumerate(request.json.keys()):
@@ -88,12 +95,13 @@ def update_freelancer(id_):
                 exception_message[field] = str(e)
         if exception_message:
             raise ValueError(exception_message)
-        sql = "UPDATE freelancers SET"
-        a = []
-        for key, value in request.json.items():
-            a.append(f" {key}='{value}' ")
-        sql += ', '.join(a) + f" WHERE id={id_}"
-        push_sql(sql, mysql)
+        freelancer = FreelancerModel.query.filter_by(id=id_)
+        if not freelancer.all():
+            return jsonify({'status': 404, 'message': "Freelancer is not found"}), 404
+        freelancer.update(request.json)
+        db.session.commit()
         return jsonify({'status': 200, 'message': "Freelancer has been successfully updated."}), 200
     except Exception as e:
+        if isinstance(e, werkzeug.exceptions.NotFound):
+            return jsonify({'status': 404, 'message': str(e)}), 404
         return jsonify({'status': 400, 'message': str(e)}), 400
