@@ -1,12 +1,70 @@
 import werkzeug.exceptions
 from flask import jsonify, request
+from flask_jwt_extended import get_jwt
 from sqlalchemy import or_, desc
-from FreelancerModel import *
-from Freelancer import Freelancer
 
+import Validation
+from FreelancerModel import *
+from UserModel import UserModel
+import bcrypt
+from Freelancer import Freelancer
 
 freelancer_schema = FreelancerSchema()
 freelancers_schema = FreelancerSchema(many=True)
+
+
+@app.route('/api/v1.0/register', methods=['POST'])
+def register():
+    try:
+        msg, email, password, name, surname = get_user_data()
+        if msg:
+            return jsonify({'status': 400, 'message': msg}), 400
+        hashed = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+        user = UserModel(email=email, hash=hashed, name=name, surname=surname)
+        db.session.add(user)
+        db.session.commit()
+
+        access_token = create_access_token(identity={"email": email})
+        return jsonify({'status': 200, 'access_token': access_token}), 200
+    except Exception as e:
+        return jsonify({'status': 400, 'message': str(e)}), 400
+
+
+def get_user_data():
+    msg = ''
+    email = request.json.get('email', None)
+    password = request.json.get('password', None)
+    surname = request.json.get('surname', None)
+    name = request.json.get('name', None)
+    if not email:
+        msg += 'Missing email '
+    else:
+        try:
+            valid = Validation.is_email(lambda *_: _)
+            valid(None, email)
+        except ValueError:
+            msg += 'Invalid email'
+    if not password:
+        msg += 'Missing password'
+    return msg, email, password, name, surname
+
+
+@app.route('/api/v1.0/login', methods=['POST'])
+def login():
+    try:
+        msg, email, password, n, s = get_user_data()
+        if msg:
+            return jsonify({'status': 400, 'message': msg}), 400
+        user = UserModel.query.filter_by(email=email).first()
+        if not user:
+            return jsonify({'status': 400, 'message': 'Invalid login info'}), 400
+        if bcrypt.checkpw(password.encode('utf-8'), user.hash.encode('utf-8')):
+            access_token = create_access_token(identity={"email": email})
+            return jsonify({'status': 200, 'access_token': access_token}), 200
+        else:
+            return jsonify({'status': 400, 'message': 'Invalid login info'}), 400
+    except AttributeError as e:
+        return jsonify({'status': 400, 'message': str(e)}), 400
 
 
 @app.route('/api/v1.0/freelancers', methods=['GET'])
@@ -109,3 +167,11 @@ def update_freelancer(id_):
         if isinstance(e, werkzeug.exceptions.NotFound):
             return jsonify({'status': 404, 'message': str(e)}), 404
         return jsonify({'status': 400, 'message': str(e)}), 400
+
+
+@app.route('/api/v1.0/jwt_test', methods=['GET'])
+@jwt_required()
+def test():
+    user = get_jwt_identity()
+    email = user['email']
+    return jsonify({"df": f'Welcome to the protected route {email}!'}), 200
