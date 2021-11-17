@@ -12,6 +12,7 @@ from Freelancer import Freelancer
 freelancer_schema = FreelancerSchema()
 freelancers_schema = FreelancerSchema(many=True)
 
+USER_DATA = ['email', 'password', 'surname', 'name']
 
 @app.route('/api/v1.0/register', methods=['POST'])
 def register():
@@ -32,21 +33,20 @@ def register():
 
 def get_user_data():
     msg = ''
-    email = request.json.get('email', None)
-    password = request.json.get('password', None)
-    surname = request.json.get('surname', None)
-    name = request.json.get('name', None)
-    if not email:
+    data = {}
+    for i in USER_DATA:
+        data[i] = request.json.get(i, None)
+    if not data['email']:
         msg += 'Missing email '
     else:
         try:
             valid = Validation.is_email(lambda *_: _)
-            valid(None, email)
+            valid(None, data['email'])
         except ValueError:
             msg += 'Invalid email'
-    if not password:
+    if not data['password']:
         msg += 'Missing password'
-    return msg, email, password, name, surname
+    return msg, *data.values()
 
 
 @app.route('/api/v1.0/login', methods=['POST'])
