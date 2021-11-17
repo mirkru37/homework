@@ -174,4 +174,4 @@ def update_freelancer(id_):
 def test():
     user = get_jwt_identity()
     email = user['email']
-    return jsonify({"df": f'Welcome to the protected route {email}!'}), 200
+    return jsonify({"status": 200, "message": f'Welcome to the protected route {email}!'}), 200

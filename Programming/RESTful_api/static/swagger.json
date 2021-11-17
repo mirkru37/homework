@@ -21,6 +21,10 @@
     {
       "name": "freelancers",
       "description": "Operations with freelancers database"
+    },
+    {
+      "name": "user",
+      "description": "Operations about user"
     }
   ],
   "paths": {
@@ -343,9 +347,175 @@
           }
         }
       }
+    },
+    "/login": {
+      "post": {
+        "tags": [
+          "user"
+        ],
+        "summary": "Log in",
+        "operationId": "loginUser",
+        "requestBody": {
+          "description": "Log in data",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Login"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "access_token": {
+                      "type": "string",
+                      "example": "asfe34-dsf/sdfa"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "example": {
+                  "status": 400,
+                  "message": "Invalid login info"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/register": {
+      "post": {
+        "tags": [
+          "user"
+        ],
+        "summary": "Register a new user",
+        "operationId": "registerUser",
+        "requestBody": {
+          "description": "Register data",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Register"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "access_token": {
+                      "type": "string",
+                      "example": "asfe34-dsf/sdfa"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "example": {
+                  "status": 400,
+                  "message": "Invalid email"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/jwt_test": {
+      "get": {
+        "tags": [
+          "user"
+        ],
+        "summary": "Test login token",
+        "description": "Test jwt login system",
+        "operationId": "testJWT",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Welcome mail@mail.com"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "invalid token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "msg": {
+                      "type": "string",
+                      "example": "Invalid"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
     "schemas": {
       "Freelancer": {
         "type": "object",
@@ -405,6 +575,40 @@
           "message": {
             "type": "string",
             "example": "Error message"
+          }
+        }
+      },
+      "Login": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "example": "email@mail.com"
+          },
+          "password": {
+            "type": "string",
+            "example": "password123"
+          }
+        }
+      },
+      "Register": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "example": "email@mail.com"
+          },
+          "password": {
+            "type": "string",
+            "example": "password123"
+          },
+          "name": {
+            "type": "string",
+            "example": "Ivan"
+          },
+          "surname": {
+            "type": "string",
+            "example": "Ivanov"
           }
         }
       }
