@@ -1,6 +1,8 @@
+from functools import wraps
+
 import werkzeug.exceptions
 from flask import jsonify, request
-from flask_jwt_extended import get_jwt
+from flask_jwt_extended import get_jwt, verify_jwt_in_request
 from sqlalchemy import or_, desc
 
 import Validation
@@ -14,6 +16,7 @@ freelancers_schema = FreelancerSchema(many=True)
 
 USER_DATA = ['email', 'password', 'surname', 'name']
 
+
 @app.route('/api/v1.0/register', methods=['POST'])
 def register():
     try:
@@ -21,11 +24,11 @@ def register():
         if msg:
             return jsonify({'status': 400, 'message': msg}), 400
         hashed = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
-        user = UserModel(email=email, hash=hashed, name=name, surname=surname)
+        user = UserModel(email=email, hash=hashed, name=name, surname=surname, role=UserRole.USER.value)
         db.session.add(user)
         db.session.commit()
 
-        access_token = create_access_token(identity={"email": email})
+        access_token = create_access_token(identity=create_identity(user))
         return jsonify({'status': 200, 'access_token': access_token}), 200
     except Exception as e:
         return jsonify({'status': 400, 'message': str(e)}), 400
@@ -49,6 +52,23 @@ def get_user_data():
     return msg, *data.values()
 
 
+def create_identity(user):
+    return {"email": user.email, "role": user.role}
+
+
+def admin_required(fn):
+    @wraps(fn)
+    def wrapper(*args, **kwargs):
+        verify_jwt_in_request()
+        identity = get_jwt_identity()
+        if identity['role'] != UserRole.ADMIN.value:
+            return jsonify({'status': 403, 'message': 'Admins only!'}), 403
+        else:
+            return fn(*args, **kwargs)
+
+    return wrapper
+
+
 @app.route('/api/v1.0/login', methods=['POST'])
 def login():
     try:
@@ -59,7 +79,8 @@ def login():
         if not user:
             return jsonify({'status': 400, 'message': 'Invalid login info'}), 400
         if bcrypt.checkpw(password.encode('utf-8'), user.hash.encode('utf-8')):
-            access_token = create_access_token(identity={"email": email})
+            access_token = create_access_token(identity=create_identity(user))
+
             return jsonify({'status': 200, 'access_token': access_token}), 200
         else:
             return jsonify({'status': 400, 'message': 'Invalid login info'}), 400
@@ -68,13 +89,13 @@ def login():
 
 
 @app.route('/api/v1.0/freelancers', methods=['GET'])
+@jwt_required()
 def get_freelancers():
     try:
         sort_by = request.args.get('sort_by')
         sort_type = request.args.get('sort_type', default='desc')
         s = request.args.get('s')
         all_fr = FreelancerModel.query
-        count = len(all_fr.all())
         if s:
             all_fr = all_fr.filter(
                 or_(
@@ -86,7 +107,7 @@ def get_freelancers():
                     FreelancerModel.salary.like(f"%{s}%"),
                     FreelancerModel.position.like(f"%{s}%"),
                 ))
-
+        count = len(all_fr.all())
         if sort_by:
             if sort_type.lower() == 'asc':
                 all_fr = all_fr.order_by(sort_by)
@@ -105,6 +126,7 @@ def get_freelancers():
 
 
 @app.route('/api/v1.0/freelancers/<int:id_>', methods=['GET'])
+@jwt_required()
 def get_freelancer(id_):
     results = freelancer_schema.dump(FreelancerModel.query.get(id_))
     if len(results) == 0:
@@ -113,6 +135,8 @@ def get_freelancer(id_):
 
 
 @app.route('/api/v1.0/freelancers', methods=['POST'])
+@jwt_required()
+@admin_required
 def post_freelancer():
     try:
         exception_message = {}
@@ -135,6 +159,8 @@ def post_freelancer():
 
 
 @app.route('/api/v1.0/freelancers/<int:id_>', methods=['DELETE'])
+@jwt_required()
+@admin_required
 def delete_freelancer(id_):
     try:
         freelancer = FreelancerModel.query.get_or_404(id_)
@@ -146,6 +172,8 @@ def delete_freelancer(id_):
 
 
 @app.route('/api/v1.0/freelancers/<int:id_>', methods=['PUT'])
+@jwt_required()
+@admin_required
 def update_freelancer(id_):
     try:
         dummy = Freelancer.init_default()

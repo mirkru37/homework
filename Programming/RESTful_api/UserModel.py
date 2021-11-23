@@ -7,3 +7,4 @@ class UserModel(db.Model):
     surname = db.Column(db.String(30))
     email = db.Column(db.String(30), unique=True, nullable=False)
     hash = db.Column(db.Text, nullable=False)
+    role = db.Column(db.String(10), nullable=False)

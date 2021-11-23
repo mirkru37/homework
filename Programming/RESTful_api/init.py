@@ -1,5 +1,6 @@
 import json
 from datetime import timedelta
+from enum import Enum
 
 import redis as redis
 from flask import Flask
@@ -35,7 +36,11 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 app.config['JWT_SECRET_KEY'] = secret['jwt_key']
 
-
 db = SQLAlchemy(app)
 ma = Marshmallow(app)
 jwt = JWTManager(app)
+
+
+class UserRole(Enum):
+    USER = 'user'
+    ADMIN = 'admin'
