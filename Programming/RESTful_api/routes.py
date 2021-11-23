@@ -8,11 +8,14 @@ from sqlalchemy import or_, desc
 import Validation
 from FreelancerModel import *
 from UserModel import UserModel
+from ContractsModel import *
 import bcrypt
 from Freelancer import Freelancer
 
 freelancer_schema = FreelancerSchema()
 freelancers_schema = FreelancerSchema(many=True)
+contract_schema = ContractSchema()
+contracts_schema = ContractSchema(many=True)
 
 USER_DATA = ['email', 'password', 'surname', 'name']
 
@@ -53,7 +56,7 @@ def get_user_data():
 
 
 def create_identity(user):
-    return {"email": user.email, "role": user.role}
+    return {"id": user.id, "email": user.email, "role": user.role}
 
 
 def admin_required(fn):
@@ -195,6 +198,61 @@ def update_freelancer(id_):
         if isinstance(e, werkzeug.exceptions.NotFound):
             return jsonify({'status': 404, 'message': str(e)}), 404
         return jsonify({'status': 400, 'message': str(e)}), 400
+
+
+@app.route('/api/v1.0/contracts', methods=['POST'])
+@jwt_required()
+def post_contract():
+    try:
+        data = request.json
+        identity = get_jwt_identity()
+        FreelancerModel.query.get_or_404(data['freelancer_id'])
+        contracts = ContractsModel.query.filter_by(user_id=identity['id'])
+        if len(contracts.all()) >= ContractsModel.CONTRACTS_LIMIT:
+            raise ValueError(f"Too much contracts for {identity['email']}")
+        new_contract = ContractsModel(freelancer_id=data['freelancer_id'], user_id=identity['id'],
+                                      description=data['description'])
+        db.session.add(new_contract)
+        db.session.commit()
+        return jsonify({'status': 200, 'message': "Contract has been successfully created."}), 200
+    except Exception as e:
+        return jsonify({'status': 400, 'message': str(e)}), 400
+
+
+@app.route('/api/v1.0/contracts', methods=['GET'])
+@jwt_required()
+def get_contracts():
+    try:
+        identity = get_jwt_identity()
+        results = contracts_schema.dump(ContractsModel.query.filter_by(user_id=identity['id']).all())
+        if len(results) == 0:
+            return jsonify({'status': 404, 'message': "No matches found"}), 404
+        return jsonify({'status': 200, 'data': results}), 200
+    except Exception as e:
+        return jsonify({'status': 400, 'message': str(e)}), 400
+
+
+@app.route('/api/v1.0/contracts/<int:id_>', methods=['GET'])
+@jwt_required()
+def get_contract(id_):
+    results = contract_schema.dump(ContractsModel.query.get(id_))
+    if len(results) == 0:
+        return jsonify({'status': 404, 'message': "Contract is not found"}), 404
+    return jsonify({'status': 200, 'data': results}), 200
+
+
+@app.route('/api/v1.0/contracts/<int:id_>', methods=['DELETE'])
+@jwt_required()
+def delete_contract(id_):
+    try:
+        contract = ContractsModel.query.get_or_404(id_)
+        if contract.user_id != get_jwt_identity()['id']:
+            raise ValueError
+        db.session.delete(contract)
+        db.session.commit()
+        return jsonify({'status': 200, 'message': "Contract has been successfully deleted."}), 200
+    except Exception as e:
+        return jsonify({'status': 404, 'message': 'Contract not found!'}), 404
 
 
 @app.route('/api/v1.0/jwt_test', methods=['GET'])
