@@ -1,6 +1,9 @@
 from abc import ABC, abstractmethod
+from copy import copy, deepcopy
 import CustomInput as Input
 from random import choice
+from Observable import Observable
+from Observer import Observer
 
 
 class AppendBehaviour(ABC):
@@ -16,8 +19,12 @@ class AppendFromRange(AppendBehaviour):
         range_ = [x for x in Input.input_range()]
         pos = Input.input_index("Input position: ")
         generator = list_.append_random(range_)
+        list_before = deepcopy(list_)
         for _ in range(n):
             list_.add_at(next(generator), pos)
+        list_after = list_
+        list_.notify(action="Add from range", position=pos, elements_count=n,
+                     list_before=list_before, list_after=list_after)
 
 
 class AppendFromFile(AppendBehaviour):
@@ -25,12 +32,16 @@ class AppendFromFile(AppendBehaviour):
         pos = Input.input_index("Input position: ")
         path = Input.input_file_path("Input file path: ")
         file = open(path)
+        list_before = deepcopy(list_)
         for line in file.readlines():
             for i in line.split(" "):
                 list_.add_at(i, pos)
+        list_after = list_
+        list_.notify(action="Add from file", position=pos, file_path=path,
+                     list_before=list_before, list_after=list_after)
 
 
-class LinkedList:
+class LinkedList(Observable):
     class Node:
         def __init__(self, data):
             self.data = data
@@ -48,13 +59,9 @@ class LinkedList:
         self.__iter_element = None
         self.__count_of_iter = 0
         self.__append_behaviour = AppendFromRange()
+        self.__observers = []
         if data is not None:
             self.add(data)
-
-    # @classmethod
-    # def empty(cls):
-    #     """Create empty list"""
-    #     return cls(None)
 
     def __str__(self):
         res = []
@@ -147,13 +154,15 @@ class LinkedList:
 
     def delete_at(self, index):
         """Delete element on "index" position"""
+        list_before = deepcopy(self)
         if index == self.__length - 1:
             self.__get_with_index(index - 1).next = None
         else:
             current = self.__get_with_index(index)
             current.assign(current.next)
         self.__length -= 1
-
+        self.notify(action="Delete at position", position=index,
+                    list_before=list_before, list_after=self)
     # def input_from_console(self, sep=" "):
     #     """Read element from console, divided by "sep=" """
     #     array = input()
@@ -164,12 +173,15 @@ class LinkedList:
         self.__append_behaviour.append(self)
 
     def delete_range(self, a, b):
+        list_before = deepcopy(self)
         if b >= self.__length:
             raise ValueError("Incorrect value!!")
         if a == 0:
             self.root = self.__get_with_index(b).next
         else:
-            self.__get_with_index(a-1).next = self.__get_with_index(b).next
+            self.__get_with_index(a - 1).next = self.__get_with_index(b).next
+        self.notify(action="Delete range", begin=a, end=b,
+                    list_before=list_before, list_after=self)
 
     @staticmethod
     def append_random(range_):
@@ -186,3 +198,13 @@ class LinkedList:
         self.__get_with_index(self.__length // 2 - 1).next = None  # break the link between left and right
         end.next = self.root  # connect left part to the end of the right
         self.root = middle  # assign new root
+
+    def notify(self, **kwargs):
+        for o in self.__observers:
+            o.update(self, **kwargs)
+
+    def registerObserver(self, observer: Observer):
+        self.__observers.append(observer)
+
+    def removeObserver(self, observer: Observer):
+        self.__observers.remove(Observer)
