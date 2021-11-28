@@ -33,6 +33,14 @@ class FreelancerCollection:
     def __len__(self):
         return len(self.__freelancers)
 
+    def __eq__(self, other):
+        if len(self.__freelancers) != len(other.__freelancers):
+            return False
+        for s, o in zip(self.__freelancers, other.__freelancers):
+            if str(s) != str(o):
+                return False
+        return True
+
     def add(self, freelancer):
         self.save()
         if type(freelancer) != Freelancer.Freelancer:
@@ -58,6 +66,10 @@ class FreelancerCollection:
         self.__freelancers.append(freelancer)
         if self.__link_to_file:
             self.__file.write(str(freelancer) + "\n")
+
+    def add_from_array(self, array):
+        for f in array:
+            self.add(f)
 
     def read_from_file(self, path):
         file = open(path)
@@ -115,9 +127,10 @@ class FreelancerCollection:
                 return i
         return -1
 
-    def edit(self, index, what):
+    def edit(self, index, what, value=None):
         self.save()
-        value = Input.field(Input.freelancer_fields, what)
+        if not value:
+            value = Input.field(Input.freelancer_fields, what)
         if what == "_Freelancer__id":
             IDs = [i.id for i in self.__freelancers]
             if value in IDs:
