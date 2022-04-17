@@ -1,1 +1,1 @@
-Homework for programming lessons of first semester 2 year of university 
+Homework for programming lessons of 2 year of university 
