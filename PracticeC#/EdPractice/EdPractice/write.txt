@@ -1,0 +1,5 @@
+1 nameC email5@mail.com +380978017118 24 78 DevOps 
+2 roman email1@mail.com +380846573848 7 12 BackEnd 
+3 name email6@mail.com +380078475688 150 90 QA 
+4 nameA email7@mail.com +380967583648 6 6 Tester 
+5 Roman email2@mail.com +380659678238 1 100 DevOps 
