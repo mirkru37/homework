@@ -10,7 +10,7 @@ namespace EdPractice
     {
         public static void Main(string[] args)
         {
-            ClassCollection cl = new ClassCollection();
+            ClassCollection<Freelancer> cl = new ClassCollection<Freelancer>();
             while (true)
             {
                 Console.WriteLine(@"Input number of option:
@@ -38,7 +38,7 @@ namespace EdPractice
                 {
                     Console.WriteLine("Input search param:");
                     string val = Console.ReadLine();
-                    ClassCollection nc = cl.Search(val);
+                    ClassCollection<Freelancer> nc = cl.Search(val);
                     nc.PrintAll();
                 }else if (num == 2)
                 {

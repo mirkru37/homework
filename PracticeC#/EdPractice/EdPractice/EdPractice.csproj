@@ -43,6 +43,7 @@
     <ItemGroup>
         <Compile Include="Freelancer.cs" />
         <Compile Include="ClassCollection.cs" />
+        <Compile Include="ICollectionable.cs" />
         <Compile Include="ISerializable.cs" />
         <Compile Include="MainProgram.cs" />
         <Compile Include="Properties\AssemblyInfo.cs" />

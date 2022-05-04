@@ -7,15 +7,15 @@ using System.Runtime.InteropServices;
 
 namespace EdPractice
 {
-    public class ClassCollection
+    public class ClassCollection<T> where T : ICollectionable, ISerializable, new()
     {
-        private List<Freelancer> _list = new List<Freelancer>();
+        private List<T> _list = new List<T>();
 
         public ClassCollection()
         {
         }
 
-        private ClassCollection(List<Freelancer> list)
+        private ClassCollection(List<T> list)
         {
             _list = list;
         }
@@ -23,7 +23,7 @@ namespace EdPractice
         public List<Hashtable> AddFromFile(string filePath)
         {
             List<Hashtable> errors = new List<Hashtable>();
-            List<Freelancer> newRecords = new List<Freelancer>();
+            List<T> newRecords = new List<T>();
             bool abortion = false;
             try
             {
@@ -53,15 +53,16 @@ namespace EdPractice
             return errors;
         }
 
-        public List<Hashtable> AddFromLine(string line = null, bool save = true, List<Freelancer> newRecords = null)
+        public List<Hashtable> AddFromLine(string line = null, bool save = true, List<T> newRecords = null)
         {
             if (newRecords == null)
-                newRecords = new List<Freelancer>();
+                newRecords = new List<T>();
             List<Hashtable> errors = new List<Hashtable>();
             try
             {
                 Hashtable args = readFromLine(line);
-                Freelancer f = new Freelancer(args);
+                T f = new T();
+                f.create(args);
                 if (!f.IsValid())
                 {
                     save = false;
@@ -95,7 +96,7 @@ namespace EdPractice
             return errors;
         }
 
-        private bool uniqueField(string field, IEnumerable<Freelancer> list, int value)
+        private bool uniqueField(string field, IEnumerable<T> list, int value)
         {
             var freelancers = list.ToList();
             if (freelancers.Count >= 1)
@@ -159,6 +160,7 @@ namespace EdPractice
         {
             Hashtable args = new Hashtable();
             string[] values = line.Split();
+            
             for (int i = 0; i < Freelancer.Fields.Length; i++)
             {
                 args.Add(Freelancer.Fields[i], values[i]);
@@ -169,14 +171,14 @@ namespace EdPractice
 
         public void SortBy(string field)
         {
-            _list = new List<Freelancer>(_list.OrderBy(o => o.GetType()
+            _list = new List<T>(_list.OrderBy(o => o.GetType()
                 .GetProperty(field)
                 .GetValue(o, null)));
         }
 
-        public ClassCollection Search(string s)
+        public ClassCollection<T> Search(string s)
         {
-            List<Freelancer> result = new List<Freelancer>();
+            List<T> result = new List<T>();
             foreach (var freelancer in _list)
             {
                 if (freelancer.Contain(s))
@@ -185,7 +187,7 @@ namespace EdPractice
                 }
             }
 
-            return new ClassCollection(result);
+            return new ClassCollection<T>(result);
         }
 
         public bool Delete(string val)
@@ -208,7 +210,7 @@ namespace EdPractice
             try
             {
                 int _id = Int32.Parse(id);
-                Freelancer f = _list.First(l => l.Id == _id);
+                T f = _list.First(l => l.Id == _id);
                 _list.Remove(f);
                 Console.WriteLine("Input values");
                 string str = "Order: ";

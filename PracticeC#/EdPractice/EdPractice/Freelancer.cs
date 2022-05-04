@@ -5,11 +5,11 @@ using System.Linq;
 
 namespace EdPractice
 {
-    public class Freelancer : ISerializable
+    public class Freelancer : ISerializable, ICollectionable
     {
         public static readonly String[] AvailablePositions = { "DevOps", "BackEnd", "QA", "Tester" };
         public static readonly String[] Fields = { "Id", "Name", "Email", "PhoneNumber", "Availability", "Salary", "Position" };
-        
+
         private int id;
         private String name;
         private String email;
@@ -18,6 +18,22 @@ namespace EdPractice
         private double salary;
         private String position;
         private Hashtable errors = new Hashtable();
+
+        public void create(Hashtable htParams)
+        {
+            foreach (var field in GetType().GetProperties())
+            {
+                try
+                {
+                    var param = Convert.ChangeType(htParams[field.Name], field.PropertyType);
+                    field.SetValue(this, param, null);
+                }  
+                catch (FormatException e)
+                {
+                    errors.Add(field.Name, e.Message);
+                }
+            }
+        }
         
         public int Id
         {
@@ -131,20 +147,9 @@ namespace EdPractice
             }
         }
 
-        public Freelancer(Hashtable htParams)
+        public Freelancer()
         {
-            foreach (var field in GetType().GetProperties())
-            {
-                try
-                {
-                    var param = Convert.ChangeType(htParams[field.Name], field.PropertyType);
-                    field.SetValue(this, param, null);
-                }  
-                catch (FormatException e)
-                {
-                    errors.Add(field.Name, e.Message);
-                }
-            }
+            
         }
 
         public Hashtable SerializableHash()
@@ -176,6 +181,11 @@ namespace EdPractice
         public Hashtable Errors()
         {
             return errors;
+        }
+
+        public string[] GetFields()
+        {
+            return Fields;
         }
 
         public bool Contain(string s)
